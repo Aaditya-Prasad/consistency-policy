@@ -1,4 +1,4 @@
-_target_: consistency_policy.student.ctm_workspace.CTMWorkspace
+_target_: consistency_policy.teacher.edm_workspace.EDMWorkspace
 checkpoint:
   save_last_ckpt: true
   save_last_snapshot: false
@@ -28,12 +28,16 @@ logging:
   group: null
   id: null
   mode: online
-  name: default
-  project: cm_policy_debug
-  resume: false
+  name: dp_test
+  project: diffusion_policy_debug
+  resume: true
+  tags:
+  - train_diffusion_unet_hybrid
+  - square_image
+  - default
 multi_run:
-  run_dir: data/outputs/cd/square/ctmpp
-  wandb_name_base: dsm_test
+  run_dir: data/outputs/2022.12.29/22.31.27_train_diffusion_unet_hybrid_square_image
+  wandb_name_base: dp_test
 n_action_steps: 8
 n_latency_steps: 0
 n_obs_steps: 2
@@ -49,7 +53,7 @@ optimizer:
   weight_decay: 1.0e-06
 past_action_visible: false
 policy:
-  _target_: consistency_policy.student.ctm_policy.CTMPPUnetHybridImagePolicy
+  _target_: consistency_policy.teacher.edm_policy.KarrasUnetHybridImagePolicy
   cond_predict_scale: true
   crop_shape:
   - 76
@@ -59,41 +63,26 @@ policy:
   - 512
   - 1024
   - 2048
-  dropout_rate: 0.2
   eval_fixed_crop: true
   horizon: 16
   kernel_size: 5
   n_action_steps: 8
   n_groups: 8
   n_obs_steps: 2
-  #extra args
-  initial_ema_decay: 0.0
-  delta: -1 #0.0068305197 # sqrt(160) * .00054
-  special_skip: true
-  #teacher
-  teacher_path: outputs/edm/square2/epoch=0200-test_mean_score=0.920.ckpt
-  teacher_time_embed: 128
-  #KDE
-  use_kde: False
-  kde_samples: 0
-  #warm start
-  edm: outputs/edm/square2/epoch=0200-test_mean_score=0.920.ckpt
-  losses: [["ctm", "dsm"], [1, 1]]
-  ctm_sampler: ctm
-  dsm_weights: "karras"
+  delta: -1
   noise_scheduler:
-    _target_: diffusion_policy.model.diffusion.karras_schedule.CTM_Scheduler
+    _target_: diffusion_policy.model.diffusion.karras_schedule.Karras_Scheduler
     time_min: 0.02
     time_max: 80.0
     rho: 7.0
     bins: 80
     solver: heun
+    time_sampler: log_normal
     scaling: boundary
     use_c_in: true
     data_std: .5
-    time_sampler: ctm
     clamp: true
-    ode_steps_max: 1
+    name: heun80
   obs_as_global_cond: true
   obs_encoder_group_norm: true
   shape_meta:
@@ -196,13 +185,13 @@ task:
     crf: 22
     dataset_path: data/robomimic/datasets/square/ph/image_abs.hdf5
     fps: 10
-    max_steps: 400
+    max_steps: 250
     n_action_steps: 8
     n_envs: 1
     n_obs_steps: 2
     n_test: 50
-    n_test_vis: 4
-    n_train: 6
+    n_test_vis: 16
+    n_train: 2
     n_train_vis: 2
     past_action: false
     render_obs_key: agentview_image
@@ -267,17 +256,16 @@ task_name: square_image
 training:
   inference_mode: false # Setting this to true disables the teacher, warm start, and training loop
   online_rollouts: true # Setting this to false disables the env_runner
-  debug: false
   checkpoint_every: 50
+  debug: false
   device: cuda:0
   gradient_accumulate_every: 1
   lr_scheduler: cosine
   lr_warmup_steps: 500
   max_train_steps: null
   max_val_steps: null
-  num_epochs: 500
+  num_epochs: 400
   resume: false
-  resume_path: None
   rollout_every: 50
   sample_every: 5
   seed: 42
@@ -285,9 +273,7 @@ training:
   use_ema: true
   val_every: 1
   val_sample_every: 5
-  output_dir: outputs/cd/square/ctmpp
-  val_chaining_steps: 1
-  p_epochs: 400
+  output_dir: outputs/edm/square
 val_dataloader:
   batch_size: 64
   num_workers: 8
