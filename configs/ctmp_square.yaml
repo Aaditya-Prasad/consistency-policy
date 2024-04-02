@@ -82,7 +82,7 @@ policy:
   ctm_sampler: ctm
   dsm_weights: "karras"
   noise_scheduler:
-    _target_: diffusion_policy.model.diffusion.karras_schedule.CTM_Scheduler
+    _target_: consistency_policy.diffusion.CTM_Scheduler
     time_min: 0.02
     time_max: 80.0
     rho: 7.0

@@ -6,7 +6,7 @@ checkpoint:
     format_str: epoch={epoch:04d}-test_mean_score={test_mean_score:.3f}.ckpt
     k: 5
     mode: max
-    monitor_key: test_mean_score
+    monitor_key: train_action_mse_error
 dataloader:
   batch_size: 64
   num_workers: 8
@@ -71,7 +71,7 @@ policy:
   n_obs_steps: 2
   delta: -1
   noise_scheduler:
-    _target_: diffusion_policy.model.diffusion.karras_schedule.Karras_Scheduler
+    _target_: consistency_policy.diffusion.Karras_Scheduler
     time_min: 0.02
     time_max: 80.0
     rho: 7.0

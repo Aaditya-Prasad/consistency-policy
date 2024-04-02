@@ -716,8 +716,6 @@ def Huber_Loss(pred, target, delta = 0, weights = None):
 
     loss = torch.sqrt(mse**2 + delta**2) - delta
 
-    loss = torch.sqrt(loss) #EXPERIMENT
-
     if weights is not None:
         loss = torch.einsum("b T D, b -> b T D", loss, weights)
 
