@@ -8,7 +8,6 @@ from einops import rearrange, reduce
 
 from diffusion_policy.model.common.normalizer import LinearNormalizer
 from diffusion_policy.policy.base_image_policy import BaseImagePolicy
-from diffusion_policy.model.diffusion.conditional_unet1d import ConditionalUnet1D
 from diffusion_policy.model.diffusion.mask_generator import LowdimMaskGenerator
 from diffusion_policy.common.robomimic_config_util import get_robomimic_config
 from robomimic.algo import algo_factory
@@ -24,6 +23,7 @@ from sklearn.neighbors import KernelDensity
 from consistency_policy.ctm_unet import CTMConditionalUnet1D
 from consistency_policy.diffusion import CTM_Scheduler, Huber_Loss
 from consistency_policy.utils import state_dict_to_model
+from consistency_policy.diffusion_unet_with_dropout import ConditionalUnet1D
 
 class CTMPPUnetHybridImagePolicy(BaseImagePolicy):
     def __init__(self, 

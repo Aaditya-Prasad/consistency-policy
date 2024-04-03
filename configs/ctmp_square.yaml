@@ -50,6 +50,7 @@ optimizer:
 past_action_visible: false
 policy:
   _target_: consistency_policy.student.ctm_policy.CTMPPUnetHybridImagePolicy
+  inference_mode: none # this will be populated automatically from training.inference_mode, do not set it here
   cond_predict_scale: true
   crop_shape:
   - 76
