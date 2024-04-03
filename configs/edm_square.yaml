@@ -6,7 +6,7 @@ checkpoint:
     format_str: epoch={epoch:04d}-test_mean_score={test_mean_score:.3f}.ckpt
     k: 5
     mode: max
-    monitor_key: train_action_mse_error
+    monitor_key: test_mean_score
 dataloader:
   batch_size: 64
   num_workers: 8
