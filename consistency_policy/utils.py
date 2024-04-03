@@ -31,6 +31,21 @@ def reduce_dims(x, target_dims):
     
     return x
 
+
+def state_dict_to_model(state_dict, pattern=r'model\.'):
+    new_state_dict = {}
+    prefix = re.compile(pattern)
+
+    for k, v in state_dict["state_dicts"]["model"].items():
+        if re.match(prefix, k):
+            # Remove prefix
+            new_k = k[6:]  
+            new_state_dict[new_k] = v
+
+    return new_state_dict
+
+
+
 def get_policy(ckpt_path, cfg = None):
     """
     Returns loaded policy from checkpoint

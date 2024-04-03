@@ -42,7 +42,7 @@ class CTMWorkspace(BaseWorkspace):
     include_keys = ['global_step', 'epoch']
 
     def __init__(self, cfg: OmegaConf, output_dir=None):
-        cfg.policy.infernence_mode = cfg.training.inference_mode
+        cfg.policy["inference_mode"] = cfg.training.inference_mode
         super().__init__(cfg, output_dir=output_dir)
 
         # set seed

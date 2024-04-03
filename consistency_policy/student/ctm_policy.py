@@ -16,13 +16,14 @@ from robomimic.algo.algo import PolicyAlgo
 import robomimic.utils.obs_utils as ObsUtils
 import robomimic.models.base_nets as rmbn
 import diffusion_policy.model.vision.crop_randomizer as dmvc
-from diffusion_policy.common.pytorch_util import dict_apply, replace_submodules, state_dict_to_model
+from diffusion_policy.common.pytorch_util import dict_apply, replace_submodules
 import numpy as np
 import random
 from sklearn.neighbors import KernelDensity
 
 from consistency_policy.ctm_unet import CTMConditionalUnet1D
 from consistency_policy.diffusion import CTM_Scheduler, Huber_Loss
+from consistency_policy.utils import state_dict_to_model
 
 class CTMPPUnetHybridImagePolicy(BaseImagePolicy):
     def __init__(self, 
