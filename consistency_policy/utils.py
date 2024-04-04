@@ -5,6 +5,7 @@ import dill
 import hydra
 from omegaconf import OmegaConf
 from consistency_policy.base_workspace import BaseWorkspace
+from diffusion_policy.dataset.base_dataset import BaseImageDataset, LinearNormalizer
 import re
 
 """Next 2 Utils from the original CM implementation"""
@@ -45,7 +46,15 @@ def state_dict_to_model(state_dict, pattern=r'model\.'):
 
     return new_state_dict
 
+def load_normalizer(workspace_state_dict):
+    keys = workspace_state_dict['state_dicts']['model'].keys()
+    normalizer_keys = [key for key in keys if 'normalizer' in key]
+    normalizer_dict = {key[11:]: workspace_state_dict['state_dicts']['model'][key] for key in normalizer_keys}
 
+    normalizer = LinearNormalizer()
+    normalizer.load_state_dict(normalizer_dict)
+
+    return normalizer
 
 def get_policy(ckpt_path, cfg = None, dataset_path = None):
     """

@@ -29,6 +29,7 @@ from diffusion_policy.model.common.lr_scheduler import get_scheduler
 
 from consistency_policy.teacher.edm_policy import KarrasUnetHybridImagePolicy
 from consistency_policy.base_workspace import BaseWorkspace
+from consistency_policy.utils import load_normalizer
 
 from contextlib import contextmanager
 import time
@@ -78,34 +79,39 @@ class EDMWorkspace(BaseWorkspace):
             if lastest_ckpt_path.is_file():
                 print(f"Resuming from checkpoint {lastest_ckpt_path}", exclude_keys=['optimizer'])
                 self.load_checkpoint(path=lastest_ckpt_path)
+                workspace_state_dict = torch.load(lastest_ckpt_path)
+                normalizer = load_normalizer(workspace_state_dict)
+                self.model.set_normalizer(normalizer)
 
-        # configure dataset
-        dataset: BaseImageDataset
-        dataset = hydra.utils.instantiate(cfg.task.dataset)
-        assert isinstance(dataset, BaseImageDataset)
-        train_dataloader = DataLoader(dataset, **cfg.dataloader)
-        normalizer = dataset.get_normalizer()
+        if not cfg.training.inference_mode:
+            # configure dataset
+            dataset: BaseImageDataset
+            dataset = hydra.utils.instantiate(cfg.task.dataset)
+            assert isinstance(dataset, BaseImageDataset)
+            train_dataloader = DataLoader(dataset, **cfg.dataloader)
+            normalizer = dataset.get_normalizer()
 
-        # configure validation dataset
-        val_dataset = dataset.get_validation_dataset()
-        val_dataloader = DataLoader(val_dataset, **cfg.val_dataloader)
+            # configure validation dataset
+            val_dataset = dataset.get_validation_dataset()
+            val_dataloader = DataLoader(val_dataset, **cfg.val_dataloader)
 
-        self.model.set_normalizer(normalizer)
-        if cfg.training.use_ema:
-            self.ema_model.set_normalizer(normalizer)
+            self.model.set_normalizer(normalizer)
+            if cfg.training.use_ema:
+                self.ema_model.set_normalizer(normalizer)
 
-        # configure lr scheduler
-        lr_scheduler = get_scheduler(
-            cfg.training.lr_scheduler,
-            optimizer=self.optimizer,
-            num_warmup_steps=cfg.training.lr_warmup_steps,
-            num_training_steps=(
-                len(train_dataloader) * cfg.training.num_epochs) \
-                    // cfg.training.gradient_accumulate_every,
-            # pytorch assumes stepping LRScheduler every epoch
-            # however huggingface diffusers steps it every batch
-            last_epoch=self.global_step-1
-        )
+            # configure lr scheduler
+            lr_scheduler = get_scheduler(
+                cfg.training.lr_scheduler,
+                optimizer=self.optimizer,
+                num_warmup_steps=cfg.training.lr_warmup_steps,
+                num_training_steps=(
+                    len(train_dataloader) * cfg.training.num_epochs) \
+                        // cfg.training.gradient_accumulate_every,
+                # pytorch assumes stepping LRScheduler every epoch
+                # however huggingface diffusers steps it every batch
+                last_epoch=self.global_step-1
+            )
+        
 
         # configure ema
         ema: EMAModel = None

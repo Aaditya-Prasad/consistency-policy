@@ -32,6 +32,7 @@ import time
 
 from consistency_policy.student.ctm_policy import CTMPPUnetHybridImagePolicy
 from consistency_policy.base_workspace import BaseWorkspace
+from consistency_policy.utils import load_normalizer
 
 OmegaConf.register_new_resolver("eval", eval, replace=True)
 
@@ -96,6 +97,9 @@ class CTMWorkspace(BaseWorkspace):
             if cfg.training.resume_path != "None":
                 print(f"Resuming from checkpoint {cfg.training.resume_path}")
                 self.load_checkpoint(path=cfg.training.resume_path, exclude_keys=['optimizer'])
+                workspace_state_dict = torch.load(cfg.training.resume_path)
+                normalizer = load_normalizer(workspace_state_dict)
+                self.model.set_normalizer(normalizer)
 
             lastest_ckpt_path = self.get_checkpoint_path()
             if lastest_ckpt_path.is_file() and cfg.training.resume_path == "None":
