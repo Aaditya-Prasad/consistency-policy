@@ -9,7 +9,7 @@ from diffusion_policy.model.diffusion.conv1d_components import (
     Downsample1d, Upsample1d, Conv1dBlock)
 from diffusion_policy.model.diffusion.positional_embedding import SinusoidalPosEmb
 
-from diffusion_policy.model.diffusion.conditional_unet1d import ConditionalResidualBlock1D
+from consistency_policy.diffusion_unet_with_dropout import ConditionalResidualBlock1D 
 
 logger = logging.getLogger(__name__)
 

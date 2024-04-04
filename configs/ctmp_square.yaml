@@ -277,8 +277,8 @@ training:
   max_train_steps: null
   max_val_steps: null
   num_epochs: 500
-  resume: false
-  resume_path: None
+  resume: true
+  resume_path: ../consistency_policy/outputs/cd/square/ablate_ctm/checkpoints/epoch=0250-test_mean_score=0.835.ckpt
   rollout_every: 50
   sample_every: 5
   seed: 42

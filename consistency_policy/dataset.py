@@ -31,6 +31,10 @@ from diffusion_policy.common.normalize_util import (
 )
 register_codecs()
 
+"""
+Just a minor change here from the original DP code to allow for base pose obs
+"""
+
 class RobomimicReplayImageDataset(BaseImageDataset):
     def __init__(self,
             shape_meta: dict,

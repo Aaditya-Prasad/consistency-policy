@@ -205,23 +205,22 @@ class CTMPPUnetHybridImagePolicy(BaseImagePolicy):
         self.use_kde = use_kde
         self.kde_samples = kde_samples
 
-
-
+        teacher = ConditionalUnet1D(
+                    input_dim=input_dim,
+                    local_cond_dim=None,
+                    global_cond_dim=global_cond_dim,
+                    diffusion_step_embed_dim=teacher_time_embed,
+                    down_dims=down_dims,
+                    kernel_size=kernel_size,
+                    n_groups=n_groups,
+                    cond_predict_scale=cond_predict_scale
+                )   
+        
         if teacher_time_embed == -1 or inference_mode == True:
             print("Inference mode or invalid teacher time embed! You should be doing inference only!")
-            teacher = None
         else:
             state_dict = state_dict_to_model(torch.load(teacher_path))
-            teacher = ConditionalUnet1D(
-                        input_dim=input_dim,
-                        local_cond_dim=None,
-                        global_cond_dim=global_cond_dim,
-                        diffusion_step_embed_dim=teacher_time_embed,
-                        down_dims=down_dims,
-                        kernel_size=kernel_size,
-                        n_groups=n_groups,
-                        cond_predict_scale=cond_predict_scale
-                    )   
+  
             teacher.load_state_dict(state_dict)
             teacher.eval()
             teacher.requires_grad_(False)

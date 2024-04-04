@@ -19,7 +19,6 @@ import wandb
 import tqdm
 import numpy as np
 import shutil
-from diffusion_policy.workspace.base_workspace import BaseWorkspace
 from diffusion_policy.dataset.base_dataset import BaseImageDataset
 from diffusion_policy.env_runner.base_image_runner import BaseImageRunner
 from diffusion_policy.common.checkpoint_util import TopKCheckpointManager
@@ -29,6 +28,7 @@ from diffusion_policy.model.diffusion.ema_model import EMAModel
 from diffusion_policy.model.common.lr_scheduler import get_scheduler
 
 from consistency_policy.teacher.edm_policy import KarrasUnetHybridImagePolicy
+from consistency_policy.base_workspace import BaseWorkspace
 
 from contextlib import contextmanager
 import time
@@ -76,24 +76,23 @@ class EDMWorkspace(BaseWorkspace):
         if cfg.training.resume:
             lastest_ckpt_path = self.get_checkpoint_path()
             if lastest_ckpt_path.is_file():
-                print(f"Resuming from checkpoint {lastest_ckpt_path}")
+                print(f"Resuming from checkpoint {lastest_ckpt_path}", exclude_keys=['optimizer'])
                 self.load_checkpoint(path=lastest_ckpt_path)
 
-        if not cfg.training.inference_mode:
-            # configure dataset
-            dataset: BaseImageDataset
-            dataset = hydra.utils.instantiate(cfg.task.dataset)
-            assert isinstance(dataset, BaseImageDataset)
-            train_dataloader = DataLoader(dataset, **cfg.dataloader)
-            normalizer = dataset.get_normalizer()
+        # configure dataset
+        dataset: BaseImageDataset
+        dataset = hydra.utils.instantiate(cfg.task.dataset)
+        assert isinstance(dataset, BaseImageDataset)
+        train_dataloader = DataLoader(dataset, **cfg.dataloader)
+        normalizer = dataset.get_normalizer()
 
-            # configure validation dataset
-            val_dataset = dataset.get_validation_dataset()
-            val_dataloader = DataLoader(val_dataset, **cfg.val_dataloader)
+        # configure validation dataset
+        val_dataset = dataset.get_validation_dataset()
+        val_dataloader = DataLoader(val_dataset, **cfg.val_dataloader)
 
-            self.model.set_normalizer(normalizer)
-            if cfg.training.use_ema:
-                self.ema_model.set_normalizer(normalizer)
+        self.model.set_normalizer(normalizer)
+        if cfg.training.use_ema:
+            self.ema_model.set_normalizer(normalizer)
 
         # configure lr scheduler
         lr_scheduler = get_scheduler(

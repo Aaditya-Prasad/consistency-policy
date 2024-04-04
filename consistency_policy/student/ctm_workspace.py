@@ -95,31 +95,30 @@ class CTMWorkspace(BaseWorkspace):
         if cfg.training.resume:
             if cfg.training.resume_path != "None":
                 print(f"Resuming from checkpoint {cfg.training.resume_path}")
-                self.load_checkpoint(path=cfg.training.resume_path)
+                self.load_checkpoint(path=cfg.training.resume_path, exclude_keys=['optimizer'])
 
             lastest_ckpt_path = self.get_checkpoint_path()
-            if lastest_ckpt_path.is_file():
+            if lastest_ckpt_path.is_file() and cfg.training.resume_path == "None":
                 print(f"Resuming from checkpoint {lastest_ckpt_path}")
-                self.load_checkpoint(path=lastest_ckpt_path)
+                self.load_checkpoint(path=lastest_ckpt_path, exclude_keys=['optimizer'])
         
 
         print("EPOCH", self.epoch)
 
-        if not cfg.training.inference_mode:
-            # configure dataset
-            dataset: BaseImageDataset
-            dataset = hydra.utils.instantiate(cfg.task.dataset)
-            assert isinstance(dataset, BaseImageDataset)
-            train_dataloader = DataLoader(dataset, **cfg.dataloader)
-            steps_per_epoch = len(train_dataloader)
-            normalizer = dataset.get_normalizer()
+        # configure dataset
+        dataset: BaseImageDataset
+        dataset = hydra.utils.instantiate(cfg.task.dataset)
+        assert isinstance(dataset, BaseImageDataset)
+        train_dataloader = DataLoader(dataset, **cfg.dataloader)
+        steps_per_epoch = len(train_dataloader)
+        normalizer = dataset.get_normalizer()
 
-            # configure validation dataset
-            val_dataset = dataset.get_validation_dataset()
-            val_dataloader = DataLoader(val_dataset, **cfg.val_dataloader)
-            steps_per_val_epoch = len(val_dataloader)
+        # configure validation dataset
+        val_dataset = dataset.get_validation_dataset()
+        val_dataloader = DataLoader(val_dataset, **cfg.val_dataloader)
+        steps_per_val_epoch = len(val_dataloader)
 
-            self.model.set_normalizer(normalizer)   
+        self.model.set_normalizer(normalizer)   
 
         self.optimizer = hydra.utils.instantiate(
             cfg.optimizer, params=self.model.parameters())
@@ -172,7 +171,8 @@ class CTMWorkspace(BaseWorkspace):
         device = torch.device(cfg.training.device)
         self.model.to(device)
 
-        optimizer_to(self.optimizer, device)
+        if not cfg.training.inference_mode:
+            optimizer_to(self.optimizer, device)
 
         # save batch for sampling
         train_sampling_batch = None

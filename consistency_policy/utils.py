@@ -5,6 +5,7 @@ import dill
 import hydra
 from omegaconf import OmegaConf
 from consistency_policy.base_workspace import BaseWorkspace
+import re
 
 """Next 2 Utils from the original CM implementation"""
 
@@ -46,7 +47,7 @@ def state_dict_to_model(state_dict, pattern=r'model\.'):
 
 
 
-def get_policy(ckpt_path, cfg = None):
+def get_policy(ckpt_path, cfg = None, dataset_path = None):
     """
     Returns loaded policy from checkpoint
     If cfg is None, the ckpt's saved cfg will be used
@@ -56,7 +57,10 @@ def get_policy(ckpt_path, cfg = None):
 
     cfg.training.inference_mode = True
     cfg.training.online_rollouts = False
-    
+
+    if dataset_path is not None:
+        cfg.task.dataset.dataset_path = dataset_path
+        cfg.task.envrunner.dataset_path = dataset_path
 
     cls = hydra.utils.get_class(cfg._target_)
     workspace = cls(cfg)
