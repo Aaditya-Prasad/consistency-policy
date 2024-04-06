@@ -1,7 +1,11 @@
 bin
 logs
 wandb
-outputs
+local_configs/
+local_cfgs/
+playground.ipynb
+
+outputs/
 data
 data_local
 .vscode

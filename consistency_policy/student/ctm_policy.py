@@ -248,6 +248,12 @@ class CTMPPUnetHybridImagePolicy(BaseImagePolicy):
         print("Teacher params: %e" % sum(p.numel() for p in self.teacher.parameters()))
         print("Vision params: %e" % sum(p.numel() for p in self.obs_encoder.parameters()))
     
+    def drop_teacher(self):
+        # When we are in inference mode, we have to load the teacher in the first place for the state dict to resolve
+        # but we don't want to actually keep it around during inference
+        # TODO: we shouldn't load the teacher in the first place
+        self.teacher = None
+    
     # ========= forward  ============
     def _forward(self, model,
             sample: torch.Tensor, 

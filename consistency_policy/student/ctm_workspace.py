@@ -43,7 +43,7 @@ class CTMWorkspace(BaseWorkspace):
     include_keys = ['global_step', 'epoch']
 
     def __init__(self, cfg: OmegaConf, output_dir=None):
-        cfg.policy["inference_mode"] = cfg.training.inference_mode
+        cfg.policy.inference_mode = cfg.training.inference_mode
         super().__init__(cfg, output_dir=output_dir)
 
         # set seed
@@ -105,43 +105,47 @@ class CTMWorkspace(BaseWorkspace):
             if lastest_ckpt_path.is_file() and cfg.training.resume_path == "None":
                 print(f"Resuming from checkpoint {lastest_ckpt_path}")
                 self.load_checkpoint(path=lastest_ckpt_path, exclude_keys=['optimizer'])
+                workspace_state_dict = torch.load(lastest_ckpt_path)
+                normalizer = load_normalizer(workspace_state_dict)
+                self.model.set_normalizer(normalizer)
         
 
         print("EPOCH", self.epoch)
 
-        # configure dataset
-        dataset: BaseImageDataset
-        dataset = hydra.utils.instantiate(cfg.task.dataset)
-        assert isinstance(dataset, BaseImageDataset)
-        train_dataloader = DataLoader(dataset, **cfg.dataloader)
-        steps_per_epoch = len(train_dataloader)
-        normalizer = dataset.get_normalizer()
+        if not cfg.training.inference_mode:
+            # configure dataset
+            dataset: BaseImageDataset
+            dataset = hydra.utils.instantiate(cfg.task.dataset)
+            assert isinstance(dataset, BaseImageDataset)
+            train_dataloader = DataLoader(dataset, **cfg.dataloader)
+            steps_per_epoch = len(train_dataloader)
+            normalizer = dataset.get_normalizer()
 
-        # configure validation dataset
-        val_dataset = dataset.get_validation_dataset()
-        val_dataloader = DataLoader(val_dataset, **cfg.val_dataloader)
-        steps_per_val_epoch = len(val_dataloader)
+            # configure validation dataset
+            val_dataset = dataset.get_validation_dataset()
+            val_dataloader = DataLoader(val_dataset, **cfg.val_dataloader)
+            steps_per_val_epoch = len(val_dataloader)
 
-        self.model.set_normalizer(normalizer)   
+            self.model.set_normalizer(normalizer)   
 
-        self.optimizer = hydra.utils.instantiate(
-            cfg.optimizer, params=self.model.parameters())
+            self.optimizer = hydra.utils.instantiate(
+                cfg.optimizer, params=self.model.parameters())
 
-        self.global_step = 0
-        self.epoch = 0
-        
-        # configure lr scheduler
-        lr_scheduler = get_scheduler(
-            cfg.training.lr_scheduler,
-            optimizer=self.optimizer,
-            num_warmup_steps=cfg.training.lr_warmup_steps,
-            num_training_steps=(
-                steps_per_epoch * self.p_epochs) \
-                    // cfg.training.gradient_accumulate_every,
-            # pytorch assumes stepping LRScheduler every epoch
-            # however huggingface diffusers steps it every batch
-            last_epoch=self.global_step-1
-        )
+            self.global_step = 0
+            self.epoch = 0
+            
+            # configure lr scheduler
+            lr_scheduler = get_scheduler(
+                cfg.training.lr_scheduler,
+                optimizer=self.optimizer,
+                num_warmup_steps=cfg.training.lr_warmup_steps,
+                num_training_steps=(
+                    steps_per_epoch * self.p_epochs) \
+                        // cfg.training.gradient_accumulate_every,
+                # pytorch assumes stepping LRScheduler every epoch
+                # however huggingface diffusers steps it every batch
+                last_epoch=self.global_step-1
+            )
 
         # configure env
         self.output_dir = cfg.training.output_dir
@@ -188,6 +192,9 @@ class CTMWorkspace(BaseWorkspace):
 
         training_sample_every = cfg.training.sample_every
         val_sample_every = cfg.training.val_sample_every
+
+        if cfg.training.inference_mode:
+            self.model.drop_teacher()
         
         with JsonLogger(log_path) as json_logger:
             for local_epoch_idx in range(cfg.training.num_epochs):

@@ -74,10 +74,15 @@ def get_policy(ckpt_path, cfg = None, dataset_path = None):
     cls = hydra.utils.get_class(cfg._target_)
     workspace = cls(cfg)
     workspace: BaseWorkspace
-    workspace.load_payload(payload, exclude_keys=None, include_keys=None)
+    workspace.load_checkpoint(path=ckpt_path, exclude_keys=['optimizer'])
+    workspace_state_dict = torch.load(ckpt_path)
+    normalizer = load_normalizer(workspace_state_dict)
 
     policy = workspace.model
+
     if cfg.training.use_ema:
         policy = workspace.ema_model
+
+    policy.set_normalizer(normalizer)
 
     return policy

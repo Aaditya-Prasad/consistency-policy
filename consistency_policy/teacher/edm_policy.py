@@ -3,7 +3,7 @@ import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from einops import rearrange, reduce\
+from einops import rearrange, reduce
 
 from diffusion_policy.model.common.normalizer import LinearNormalizer
 from diffusion_policy.policy.base_image_policy import BaseImagePolicy
@@ -30,7 +30,7 @@ class KarrasUnetHybridImagePolicy(BaseImagePolicy):
             n_obs_steps,
             obs_as_global_cond=True,
             crop_shape=(76, 76),
-            diffusion_step_embed_dim=256,
+            diffusion_step_embed_dim=128,
             down_dims=(256,512,1024),
             kernel_size=5,
             n_groups=8,
@@ -146,6 +146,8 @@ class KarrasUnetHybridImagePolicy(BaseImagePolicy):
             n_groups=n_groups,
             cond_predict_scale=cond_predict_scale
         )
+
+        model.prepare_drop_generators()
 
         self.obs_encoder = obs_encoder
         self.model = model
