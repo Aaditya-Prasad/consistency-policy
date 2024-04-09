@@ -79,10 +79,6 @@ def get_policy(ckpt_path, cfg = None, dataset_path = None):
     normalizer = load_normalizer(workspace_state_dict)
 
     policy = workspace.model
-
-    if cfg.training.use_ema:
-        policy = workspace.ema_model
-
     policy.set_normalizer(normalizer)
 
     return policy
