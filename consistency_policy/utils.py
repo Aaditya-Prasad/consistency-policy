@@ -7,6 +7,10 @@ from omegaconf import OmegaConf
 from consistency_policy.base_workspace import BaseWorkspace
 from diffusion_policy.dataset.base_dataset import BaseImageDataset, LinearNormalizer
 import re
+from scipy.spatial.transform import Rotation as R
+import pytorch3d.transforms as pt
+import numpy as np
+
 
 """Next 2 Utils from the original CM implementation"""
 
@@ -33,6 +37,17 @@ def reduce_dims(x, target_dims):
     
     return x
 
+def euler_to_quat(euler, degrees=False):
+    return R.from_euler("xyz", euler, degrees=degrees).as_quat()
+
+def rot6d_to_rmat(rot_6d: torch.Tensor) -> torch.Tensor:
+    return pt.rotation_6d_to_matrix(rot_6d)
+
+def rmat_to_euler(rot_mat: np.ndarray, degrees=False) -> np.ndarray:
+    if isinstance(rot_mat, torch.Tensor):
+        rot_mat = rot_mat.cpu().numpy()
+    euler = R.from_matrix(rot_mat).as_euler("xyz", degrees=degrees)
+    return euler
 
 def state_dict_to_model(state_dict, pattern=r'model\.'):
     new_state_dict = {}

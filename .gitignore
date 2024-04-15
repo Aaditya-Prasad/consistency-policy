@@ -3,7 +3,6 @@ logs
 wandb
 local_configs/
 local_cfgs/
-playground.ipynb
 
 outputs/
 data
