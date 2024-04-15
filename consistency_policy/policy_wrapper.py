@@ -75,7 +75,7 @@ class PolicyWrapperRobomimic:
             pos = actions[..., :6].cpu().numpy()
             gripper = actions[..., [-1]].cpu().numpy()
 
-            d_rot = actions.shape[-1] - 4
+            d_rot = 6
             rot = actions[..., 6: 6 + d_rot]
             # rot = rot6d_to_rmat(rot)
             rot = rot[0].cpu().numpy()
