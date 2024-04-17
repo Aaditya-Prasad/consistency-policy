@@ -88,11 +88,8 @@ class BaseWorkspace:
         if include_keys == "EDM":
             include_keys = tuple()
 
-        print("YOU ARE EXCLUDING: ", exclude_keys)
 
         for key, value in payload['state_dicts'].items():
-            print(key)
-            print(payload['state_dicts'].keys())
             if key not in exclude_keys:
                 if key == "model" and update_dict_dim is not None:
                     dsed = update_dict_dim

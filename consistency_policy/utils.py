@@ -11,6 +11,8 @@ from scipy.spatial.transform import Rotation as R
 import pytorch3d.transforms as pt
 import numpy as np
 
+NORMALIZER_PREFIX_LENGTH = 11
+MODEL_PREFIX_LENGTH = 6
 
 """Next 2 Utils from the original CM implementation"""
 
@@ -56,7 +58,7 @@ def state_dict_to_model(state_dict, pattern=r'model\.'):
     for k, v in state_dict["state_dicts"]["model"].items():
         if re.match(prefix, k):
             # Remove prefix
-            new_k = k[6:]  
+            new_k = k[MODEL_PREFIX_LENGTH:]  
             new_state_dict[new_k] = v
 
     return new_state_dict
@@ -64,7 +66,8 @@ def state_dict_to_model(state_dict, pattern=r'model\.'):
 def load_normalizer(workspace_state_dict):
     keys = workspace_state_dict['state_dicts']['model'].keys()
     normalizer_keys = [key for key in keys if 'normalizer' in key]
-    normalizer_dict = {key[11:]: workspace_state_dict['state_dicts']['model'][key] for key in normalizer_keys}
+    normalizer_dict = {key[NORMALIZER_PREFIX_LENGTH:]: workspace_state_dict['state_dicts']['model'][key] for key in normalizer_keys}
+    print(normalizer_dict.keys())
 
     normalizer = LinearNormalizer()
     normalizer.load_state_dict(normalizer_dict)

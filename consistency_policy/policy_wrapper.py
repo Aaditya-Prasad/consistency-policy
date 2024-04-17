@@ -8,7 +8,7 @@ from diffusion_policy.common.pytorch_util import dict_apply
 
 
 class PolicyWrapperRobomimic:
-    def __init__(self, policy, n_obs, n_acts, cfg=None, device="cpu"):
+    def __init__(self, policy, n_obs, n_acts, d_pos, d_rot, cfg=None, device="cpu"):
         self.policy = policy
 
         self.obs_chunker = ObsChunker(n_obs_steps=n_obs)
@@ -22,6 +22,9 @@ class PolicyWrapperRobomimic:
 
         self.c_obs = 0
         self.c_acts = 0
+
+        self.d_pos = d_pos
+        self.d_rot = d_rot
 
         self.transform = T.Compose([
             T.ToTensor(),
@@ -72,11 +75,10 @@ class PolicyWrapperRobomimic:
 
             # Hardcoded action shapes
             actions = result["action"]
-            pos = actions[..., :6].cpu().numpy()
+            pos = actions[..., :self.d_pos].cpu().numpy()
             gripper = actions[..., [-1]].cpu().numpy()
 
-            d_rot = 6
-            rot = actions[..., 6: 6 + d_rot]
+            rot = actions[..., self.d_pos: self.d_pos + self.d_rot]
             # rot = rot6d_to_rmat(rot)
             rot = rot[0].cpu().numpy()
             # rot = rmat_to_euler(rot)

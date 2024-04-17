@@ -66,7 +66,6 @@ class CTMWorkspace(BaseWorkspace):
         cfg = copy.deepcopy(self.cfg)
 
         if cfg.training.debug:
-            print("HI WE'RE IN DEBUG MODE")
             self.model.noise_scheduler.ode_steps_max = 1
             cfg.training.num_epochs = 2
             cfg.training.max_train_steps = 3
