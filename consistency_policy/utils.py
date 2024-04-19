@@ -71,7 +71,6 @@ def load_normalizer(workspace_state_dict):
     keys = workspace_state_dict['state_dicts']['model'].keys()
     normalizer_keys = [key for key in keys if 'normalizer' in key]
     normalizer_dict = {key[NORMALIZER_PREFIX_LENGTH:]: workspace_state_dict['state_dicts']['model'][key] for key in normalizer_keys}
-    print(normalizer_dict.keys())
 
     normalizer = LinearNormalizer()
     normalizer.load_state_dict(normalizer_dict)

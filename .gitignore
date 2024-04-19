@@ -16,6 +16,7 @@ fuse.cfg
 
 *.ai
 
+test_script.py
 # Generation results
 results/
 
