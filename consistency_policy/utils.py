@@ -51,6 +51,10 @@ def rmat_to_euler(rot_mat: np.ndarray, degrees=False) -> np.ndarray:
     euler = R.from_matrix(rot_mat).as_euler("xyz", degrees=degrees)
     return euler
 
+def rmat_to_quat(rot_mat, degrees=False):
+    quat = R.from_matrix(rot_mat).as_quat()
+    return quat
+
 def state_dict_to_model(state_dict, pattern=r'model\.'):
     new_state_dict = {}
     prefix = re.compile(pattern)

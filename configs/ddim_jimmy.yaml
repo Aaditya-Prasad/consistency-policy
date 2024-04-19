@@ -1,4 +1,4 @@
-_target_: consistency_policy.teacher.edm_workspace.EDMWorkspace
+_target_: consistency_policy.baseline.train_diffusion_unet_hybrid_workspace.TrainDiffusionUnetHybridWorkspace
 checkpoint:
   save_last_ckpt: true
   save_last_snapshot: false
@@ -28,16 +28,16 @@ logging:
   group: null
   id: null
   mode: online
-  name: dp_test
+  name: 2022.12.29-22.31.30_train_diffusion_unet_hybrid_square_image
   project: diffusion_policy_debug
   resume: true
   tags:
   - train_diffusion_unet_hybrid
-  - jimmy
+  - square_image
   - default
 multi_run:
-  run_dir: data/outputs/2022.12.29/22.31.27_train_diffusion_unet_hybrid_jimmy
-  wandb_name_base: dp_test
+  run_dir: data/outputs/2022.12.29/22.31.30_train_diffusion_unet_hybrid_square_image
+  wandb_name_base: 2022.12.29-22.31.30_train_diffusion_unet_hybrid_square_image
 n_action_steps: 8
 n_latency_steps: 0
 n_obs_steps: 2
@@ -53,13 +53,9 @@ optimizer:
   weight_decay: 1.0e-06
 past_action_visible: false
 policy:
-  _target_: consistency_policy.teacher.edm_policy.KarrasUnetHybridImagePolicy
-  delta: -1
-  inference_mode: none # this will be populated automatically from training.inference_mode, do not set it here
+  _target_: diffusion_policy.policy.diffusion_unet_hybrid_image_policy.DiffusionUnetHybridImagePolicy
   cond_predict_scale: true
-  crop_shape:
-  - 76
-  - 76
+  crop_shape: null
   diffusion_step_embed_dim: 128
   down_dims:
   - 512
@@ -72,18 +68,24 @@ policy:
   n_groups: 8
   n_obs_steps: 2
   noise_scheduler:
-    _target_: consistency_policy.diffusion.Karras_Scheduler
-    time_min: 0.02
-    time_max: 80.0
-    rho: 7.0
-    bins: 80
-    solver: heun
-    time_sampler: log_normal
-    scaling: boundary
-    use_c_in: true
-    data_std: .5
-    clamp: true
-    name: heun80
+    # _target_: diffusers.schedulers.scheduling_ddpm.DDPMScheduler
+    # beta_end: 0.02
+    # beta_schedule: squaredcos_cap_v2
+    # beta_start: 0.0001
+    # clip_sample: true
+    # num_train_timesteps: 100
+    # prediction_type: epsilon
+    # variance_type: fixed_small
+    _target_: diffusers.schedulers.scheduling_ddim.DDIMScheduler
+    num_train_timesteps: 100
+    beta_start: 0.0001
+    beta_end: 0.02
+    beta_schedule: squaredcos_cap_v2
+    clip_sample: True
+    set_alpha_to_one: True
+    steps_offset: 0
+    prediction_type: epsilon # or sample
+  num_inference_steps: 15
   obs_as_global_cond: true
   obs_encoder_group_norm: true
   shape_meta:
@@ -199,12 +201,12 @@ task:
     n_action_steps: 8
     n_envs: 28
     n_obs_steps: 2
-    n_test: 50
+    n_test: 28
     n_test_vis: 4
     n_train: 6
     n_train_vis: 2
     past_action: false
-    render_obs_key: base_image
+    render_obs_key: agentview_image
     shape_meta:
       action:
         shape:
@@ -237,7 +239,7 @@ task:
     test_start_seed: 100000
     tqdm_interval_sec: 1.0
     train_start_idx: 0
-  name: jimmy
+  name: jimmy_image
   shape_meta:
     action:
       shape:
@@ -268,11 +270,11 @@ task:
         - 84
         type: rgb
   task_name: jimmy
-task_name: jimmy
+task_name: jimmy_image
 training:
-  inference_mode: false # Setting this to true disables the dataset and training loop
-  online_rollouts: false # Setting this to false disables the env_runner
   checkpoint_every: 50
+  inference_mode: false
+  online_rollouts: true
   debug: false
   device: cuda:0
   gradient_accumulate_every: 1
@@ -282,7 +284,7 @@ training:
   max_val_steps: null
   num_epochs: 8000
   resume: false
-  resume_path: None
+  resume_path: ???
   rollout_every: 50
   sample_every: 5
   seed: 42
@@ -290,7 +292,8 @@ training:
   use_ema: true
   val_every: 1
   val_sample_every: 5
-  output_dir: outputs/karras/jimmy_2
+  num_evaluate_steps: 15
+  output_dir: outputs/ddim/jimmy
 val_dataloader:
   batch_size: 64
   num_workers: 8
