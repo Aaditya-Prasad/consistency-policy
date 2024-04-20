@@ -3,10 +3,10 @@ checkpoint:
   save_last_ckpt: true
   save_last_snapshot: false
   topk:
-    format_str: epoch={epoch:04d}-val_mse_error={val_mse_error:.3f}.ckpt
+    format_str: epoch={epoch:04d}-train_action_mse_error={train_action_mse_error:.3f}.ckpt
     k: 5
     mode: max
-    monitor_key: val_mse_error
+    monitor_key: train_action_mse_error
 dataloader:
   batch_size: 64
   num_workers: 8
@@ -149,9 +149,9 @@ shape_meta:
 task:
   abs_action: true
   dataset:
-    _target_: consistency_policy.dataset.RobomimicReplayImageDataset
+    _target_: consistency_policy.jimmy_dataset.RobomimicReplayImageDataset
     abs_action: true
-    dataset_path: data/jimmy/demos-2-button.hdf5
+    dataset_path: data/jimmy/demos-1-lift-v2.hdf5
     horizon: 16
     n_obs_steps: 2
     pad_after: 7
@@ -189,13 +189,13 @@ task:
           type: rgb
     use_cache: true
     val_ratio: 0.02
-  dataset_path: data/jimmy/demos-2-button.hdf5
+  dataset_path: data/jimmy/demos-1-lift-v2.hdf5
   dataset_type: ph
   env_runner:
     _target_: diffusion_policy.env_runner.robomimic_image_runner.RobomimicImageRunner
     abs_action: true
     crf: 22
-    dataset_path: data/jimmy/demos-2-button.hdf5
+    dataset_path: data/jimmy/demos-1-lift-v2.hdf5
     fps: 10
     max_steps: 400
     n_action_steps: 8
@@ -274,7 +274,7 @@ task_name: jimmy_image
 training:
   checkpoint_every: 50
   inference_mode: false
-  online_rollouts: true
+  online_rollouts: false
   debug: false
   device: cuda:0
   gradient_accumulate_every: 1

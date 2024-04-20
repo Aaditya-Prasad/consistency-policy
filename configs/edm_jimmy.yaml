@@ -147,7 +147,7 @@ shape_meta:
 task:
   abs_action: true
   dataset:
-    _target_: consistency_policy.dataset.RobomimicReplayImageDataset
+    _target_: consistency_policy.jimmy_dataset.RobomimicReplayImageDataset
     abs_action: true
     dataset_path: data/jimmy/demos-2-button.hdf5
     horizon: 16
