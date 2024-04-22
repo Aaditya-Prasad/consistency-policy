@@ -14,7 +14,7 @@ from threadpoolctl import threadpool_limits
 import concurrent.futures
 import multiprocessing
 from omegaconf import OmegaConf
-from diffusion_policy.common.pytorch_util import dict_apply
+from diffusion_policy.common.pytorch_util import dict_apply, dict_apply_reduce, dict_apply_split
 from diffusion_policy.dataset.base_dataset import BaseImageDataset, LinearNormalizer
 from diffusion_policy.model.common.normalizer import LinearNormalizer, SingleFieldLinearNormalizer
 from diffusion_policy.model.common.rotation_transformer import RotationTransformer
@@ -22,7 +22,6 @@ from diffusion_policy.codecs.imagecodecs_numcodecs import register_codecs, Jpeg2
 from diffusion_policy.common.replay_buffer import ReplayBuffer
 from diffusion_policy.common.sampler import SequenceSampler, get_val_mask
 from diffusion_policy.common.normalize_util import (
-    robomimic_abs_action_only_normalizer_from_stat,
     robomimic_abs_action_only_dual_arm_normalizer_from_stat,
     get_range_normalizer_from_stat,
     get_image_range_normalizer,
@@ -32,7 +31,7 @@ from diffusion_policy.common.normalize_util import (
 register_codecs()
 
 """
-Just a minor change here from the original DP code to allow for base pose obs
+Just a minor change here from the original DP code to allow for base pose obs and 6 pos dims
 """
 
 class RobomimicReplayImageDataset(BaseImageDataset):
@@ -376,4 +375,54 @@ def normalizer_from_stat(stat):
         scale=scale,
         offset=offset,
         input_stats_dict=stat
+    )
+
+
+def robomimic_abs_action_only_normalizer_from_stat(stat):
+    result = dict_apply_split(
+        stat, lambda x: {
+            'pos': x[...,:6],
+            'other': x[...,6:]
+    })
+
+    def get_pos_param_info(stat, output_max=1, output_min=-1, range_eps=1e-7):
+        # -1, 1 normalization
+        input_max = stat['max']
+        input_min = stat['min']
+        input_range = input_max - input_min
+        ignore_dim = input_range < range_eps
+        input_range[ignore_dim] = output_max - output_min
+        scale = (output_max - output_min) / input_range
+        offset = output_min - scale * input_min
+        offset[ignore_dim] = (output_max + output_min) / 2 - input_min[ignore_dim]
+
+        return {'scale': scale, 'offset': offset}, stat
+
+    
+    def get_other_param_info(stat):
+        example = stat['max']
+        scale = np.ones_like(example)
+        offset = np.zeros_like(example)
+        info = {
+            'max': np.ones_like(example),
+            'min': np.full_like(example, -1),
+            'mean': np.zeros_like(example),
+            'std': np.ones_like(example)
+        }
+        return {'scale': scale, 'offset': offset}, info
+
+    pos_param, pos_info = get_pos_param_info(result['pos'])
+    other_param, other_info = get_other_param_info(result['other'])
+
+    param = dict_apply_reduce(
+        [pos_param, other_param], 
+        lambda x: np.concatenate(x,axis=-1))
+    info = dict_apply_reduce(
+        [pos_info, other_info], 
+        lambda x: np.concatenate(x,axis=-1))
+
+    return SingleFieldLinearNormalizer.create_manual(
+        scale=param['scale'],
+        offset=param['offset'],
+        input_stats_dict=info
     )
