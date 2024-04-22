@@ -9,7 +9,7 @@
 
 #SBATCH --nodelist=juno2
 
-#SBATCH --job-name="jimmy_ddim_lift2"
+#SBATCH --job-name="jimmy_ddim"
 #SBATCH --output=../outputs/slurm_logs/ap_%j.out
 
 # only use the following if you want email notification
@@ -42,7 +42,7 @@ conda activate robodiff-retry
 # python test_muj.py
 export HYDRA_FULL_ERROR=1
 
-dir="outputs/ddim/jimmy_lift2"
+dir="outputs/ddim/jimmy_testv3"
 
 if [ -d "$dir" ]; then
     rm -r "$dir"
@@ -51,8 +51,8 @@ fi
 mkdir -p "$dir"
 
 CUDA_VISIBLE_DEVICES=0 python train.py --config-dir=configs/ --config-name=ddim_jimmy.yaml \
-    training.seed=42 training.device=cuda:0 logging.name=ddim_jimmy_lift2 \
-    training.output_dir="$dir" > outputs/slurm_logs/ddim_jimmy_lift2.out 2>&1 
+    training.seed=42 training.device=cuda:0 logging.name=ddim_testv3 \
+    training.output_dir="$dir" > outputs/slurm_logs/ddim_testv3.out 2>&1 
 
 
 # done

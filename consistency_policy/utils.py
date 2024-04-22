@@ -103,3 +103,8 @@ def get_policy(ckpt_path, cfg = None, dataset_path = None):
     policy.set_normalizer(normalizer)
 
     return policy
+
+def get_cfg(ckpt_path):
+    payload = torch.load(open(ckpt_path, 'rb'), pickle_module=dill)
+    cfg = payload['cfg']
+    return cfg

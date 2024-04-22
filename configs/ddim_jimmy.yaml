@@ -3,10 +3,10 @@ checkpoint:
   save_last_ckpt: true
   save_last_snapshot: false
   topk:
-    format_str: epoch={epoch:04d}-train_action_mse_error={train_action_mse_error:.3f}.ckpt
+    format_str: epoch={epoch:04d}-train_loss={train_loss:.6f}.ckpt
     k: 5
     mode: max
-    monitor_key: train_action_mse_error
+    monitor_key: train_loss
 dataloader:
   batch_size: 64
   num_workers: 8
@@ -151,7 +151,7 @@ task:
   dataset:
     _target_: consistency_policy.jimmy_dataset.RobomimicReplayImageDataset
     abs_action: true
-    dataset_path: data/jimmy/demos-1-lift-v2.hdf5
+    dataset_path: data/jimmy/demos-0-test-v3.hdf5
     horizon: 16
     n_obs_steps: 2
     pad_after: 7
@@ -189,13 +189,13 @@ task:
           type: rgb
     use_cache: true
     val_ratio: 0.02
-  dataset_path: data/jimmy/demos-1-lift-v2.hdf5
+  dataset_path: data/jimmy/demos-0-test-v3.hdf5
   dataset_type: ph
   env_runner:
     _target_: diffusion_policy.env_runner.robomimic_image_runner.RobomimicImageRunner
     abs_action: true
     crf: 22
-    dataset_path: data/jimmy/demos-1-lift-v2.hdf5
+    dataset_path: data/jimmy/demos-0-test-v3.hdf5
     fps: 10
     max_steps: 400
     n_action_steps: 8
@@ -290,8 +290,8 @@ training:
   seed: 42
   tqdm_interval_sec: 1.0
   use_ema: true
-  val_every: 1
-  val_sample_every: 5
+  val_every: 1000000
+  val_sample_every: 5000000
   num_evaluate_steps: 15
   output_dir: outputs/ddim/jimmy
 val_dataloader:
