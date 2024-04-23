@@ -379,6 +379,9 @@ def normalizer_from_stat(stat):
 
 
 def robomimic_abs_action_only_normalizer_from_stat(stat):
+    """
+    Normalizer util for 6D pos
+    """
     result = dict_apply_split(
         stat, lambda x: {
             'pos': x[...,:6],
