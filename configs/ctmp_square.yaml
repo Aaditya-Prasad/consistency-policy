@@ -71,9 +71,9 @@ policy:
   initial_ema_decay: 0.0
   delta: -1 #0.0068305197 # sqrt(160) * .00054
   special_skip: true
+  chaining_times: ['D', 27, 54]
   #teacher
   teacher_path: outputs/edm/square2/epoch=0200-test_mean_score=0.920.ckpt
-  teacher_time_embed: 128
   #KDE
   use_kde: False
   kde_samples: 0

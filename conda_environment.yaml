@@ -1,4 +1,4 @@
-name: robodiff-retry
+name: consistency-policy
 channels:
   - pytorch3d
   - pytorch

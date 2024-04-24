@@ -48,7 +48,6 @@ class CTMPPUnetHybridImagePolicy(BaseImagePolicy):
             special_skip = True,
             #teacher
             teacher_path = None,
-            teacher_time_embed = -1,
             #KDE
             use_kde = False, 
             kde_samples = 0,
@@ -209,18 +208,17 @@ class CTMPPUnetHybridImagePolicy(BaseImagePolicy):
                     input_dim=input_dim,
                     local_cond_dim=None,
                     global_cond_dim=global_cond_dim,
-                    diffusion_step_embed_dim=teacher_time_embed,
+                    diffusion_step_embed_dim=diffusion_step_embed_dim,
                     down_dims=down_dims,
                     kernel_size=kernel_size,
                     n_groups=n_groups,
                     cond_predict_scale=cond_predict_scale
                 )   
         
-        if teacher_time_embed == -1 or inference_mode == True:
-            print("Inference mode or invalid teacher time embed! You should be doing inference only!")
+        if inference_mode == True:
+            print("You should be doing inference only!")
         else:
             state_dict = state_dict_to_model(torch.load(teacher_path))
-  
             teacher.load_state_dict(state_dict)
             teacher.eval()
             teacher.requires_grad_(False)
@@ -532,7 +530,7 @@ class CTMPPUnetHybridImagePolicy(BaseImagePolicy):
         torch._foreach_add_(param_ema, param, alpha=1 - ema_decay)
 
     def enable_chaining(self):
-        if self.chaining_times is not None:
+        if self.chaining_times is not None or self.chaining_times == "None":
             self.chain = True
             print("Chaining enabled with times: ", self.chaining_times)
 

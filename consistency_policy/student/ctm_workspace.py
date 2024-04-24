@@ -83,7 +83,7 @@ class CTMWorkspace(BaseWorkspace):
             cfg.task.env_runner.n_train_vis = 1
             
         if cfg.policy.edm != "None" and cfg.training.inference_mode == False:
-            print(f"Warm starting from {cfg.policy.teacher_path}")
+            print(f"Warm starting from {cfg.policy.edm}")
             self.load_checkpoint(path=cfg.policy.edm, exclude_keys=['ema_model', 'optimizer', 'epoch', 'global_step', '_output_dir'], 
                                  update_dict_dim=cfg.policy.diffusion_step_embed_dim, strict=False)
             self.model.obs_encoder.eval()

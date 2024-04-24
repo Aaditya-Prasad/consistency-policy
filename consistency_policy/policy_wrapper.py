@@ -7,7 +7,7 @@ from torchvision import transforms as T
 from diffusion_policy.common.pytorch_util import dict_apply
 
 
-class PolicyWrapperRobomimic:
+class PolicyWrapper:
     def __init__(self, policy, n_obs, n_acts, d_pos, d_rot, cfg=None, device="cpu"):
         self.policy = policy
 
@@ -95,6 +95,12 @@ class PolicyWrapperRobomimic:
     def reset(self):
         self.obs_chunker.reset()
         self.action_chunker.reset()
+
+    def enable_chaining(self):
+        if hasattr(self.policy, "enable_chaining"):
+            self.policy.enable_chaining()
+        else:
+            raise NotImplementedError("Chosen policy does not support chaining.")
 
 class ActionChunker:
     """Wrapper for chunking actions. Takes in an action sequence; returns one action when queried.
