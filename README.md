@@ -5,7 +5,7 @@
 [[Data]](TODO)
 
 
-[Aaditya Prasad](TODO)<sup>1</sup>,
+[Aaditya Prasad](https://www.linkedin.com/in/aaditya-prasad/)<sup>1</sup>,
 [Kevin Lin](https://kevin-thankyou-lin.github.io/)<sup>1</sup>,
 [Linqi Zhou](https://alexzhou907.github.io/)<sup>1</sup>,
 [Jeannette Bohg](https://web.stanford.edu/~bohg/)<sup>1</sup>,
@@ -43,21 +43,32 @@ Training is done similarly to [Diffusion Policy](https://github.com/real-stanfor
 ```
 Example configs for the robomimic square task are provided in the configs/ directory. Three types of networks are supported in this implementation and are referred to by their diffusion framework: EDM, CTMP, DDIM. 
 
-To train a policy, pick a desired framework and update task, dataset, and shape_meta keys, as well as any other hyperparamaters. If you are training without an online sim, set training.online_rollouts=false. You should always set training.inference_mode=false while training. As a side note, 
+To train a policy, pick a desired framework and update ```task```, ```dataset```, and ```shape_meta keys```, as well as any other hyperparamaters. If you are training without an online sim, set ```training.online_rollouts```=false. You should always set training.inference_mode=false while training. 
 
 Below are specific instructions for the different networks. 
 
 ### Teacher Network (EDM)
-Before distilling a few-step Consistency Policy, a teacher network needs to be trained. The implemented teacher network follows the [EDM](https://arxiv.org/abs/2206.00364) diffusion framework. policy.noise_scheduler is the key introduced paramater; this controls the noise scheduler and diffusion process. If you have not worked with diffusion models before, the main paramater to concern yourself with is policy.noise_scheduler.bins, which is 80 in the example configs. This is the number of discretization steps in the backwards diffusion process. This number does not affect training speed (and can be changed after/during training). More bins leads to more accurate policy inference (which will show up in mse_error and eval scores) and longer inference times. 
+Before distilling a few-step Consistency Policy, a teacher network needs to be trained. The implemented teacher network follows the [EDM](https://arxiv.org/abs/2206.00364) diffusion framework. ```policy.noise_scheduler``` holds the key introduced hyperparamaters; this controls the noise scheduler and diffusion process. If you have not worked with diffusion models before, ```policy.noise_scheduler.bins```, which is 80 in the example configs, is the main paramater you might wish to change. This is the number of discretization steps in the backwards diffusion process. This number does not affect training speed (and can be changed after/during training). More bins leads to more accurate policy inference (which will show up in mse_error and eval scores) and longer inference times. 
 
 ### Student Network (CTMP)
-Once you have a trained teacher checkpoint, you are ready to distill a Consistency Policy. Set policy.teacher_path in the config to the desired ckpt path. It is heavily recommended to warm-start your CP with the teacher checkpoint, which only requires setting policy.edm to the same path as policy.teacher_path (you could set these to two different paths but there is no good reason to do so). 
+Once you have a trained teacher checkpoint, you are ready to distill a Consistency Policy. Set ```policy.teacher_path``` in the config to the desired ckpt path. It is heavily recommended to warm-start your CP with the teacher checkpoint, which only requires setting ```policy.edm``` to the same path as ```policy.teacher_path```. 
 
-Your student and teacher must have the same policy.diffusion_step_embed_dim! Ensure that these are the same and check your EDM cfg for the correct value if you are not sure.
+Your student and teacher must have the same ```policy.diffusion_step_embed_dim```! Ensure that these are the same and check your EDM cfg for the correct value if you are not sure.
 
-As with the teacher network, policy.noise_scheduler contains most of the specialized hyperparamaters. 
+As with the teacher network, ```policy.noise_scheduler``` contains most of the specialized hyperparamaters. Increasing the number of bins increases training convergence time as well as the accuracy of the converged model, though both of these effects vary in size. Additionally, ```policy.losses``` lists the objectives that are taken into account (```dsm``` and ```ctm```) as well as their multipliers: these correspond to $\alpha$ and $\beta$ in Eq. 8 of the paper and allow you to adjust the relative weighting of the losses. 
+
+By default, you are training and evaluating a single-step network. For multi-step inference, see the Deploying section below.  
+
+### Baseline Network (DDiM)
+The baseline network is largely the same as in Diffusion Policy's implementation, and uses the Hugging Face DDiM noise scheduler. ```policy.num_inference``` steps plays a similar role to the teacher network's ```policy.noise_scheduler.bins```. The number of inference steps can be changed at test time and increases both accuracy and inference time. The baseline network cannot be used for distilation but can be useful to check your setup with, since it doesn't require the training of both a teacher and student network. 
+
 ## Deploying
 
+Once you have trained a policy, you can use the ```get_policy``` function in ```consistency_policy.utils``` to load an inference-ready version of the policy from a checkpoint. If you wish to change any of the test-time hyperparamaters of the policy, you can pass in a new config file with your desired changes. By default, ```get_policy``` loads the config that the model was trained with, activates inference mode, and deactivates online rollouts. 
+
+We also include a ```PolicyWrapper``` that wraps a provided policy with action and observation chunking. ```example.ipynb``` shows an example of loading a policy, wrapping it, and generating new actions. 
+
+As mentioned earlier, a Consistency Policy can complete multi-step inference at test time. Before chaining is enabled, you must define the timesteps that you wish to chain at under ```policy.chaining_times```. We found that even partitions of discretized time work well as a heurstic: thus, our default setting is ```policy.chaining_times = ['D',27,54]``` for three-step inference that chains from 0, 27, and 54 bins. Once you have set this paramater, you must call ```policy.enable_chaining()``` (the ```PolicyWrapper``` supports this method as well). More details and an explanation of chaining can be found in our paper. 
 
 ## 🧾 Checkout our experiment logs!
 
