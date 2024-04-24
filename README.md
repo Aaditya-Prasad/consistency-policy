@@ -15,7 +15,8 @@
 
 <img src="media/teaser.png" alt="drawing" width="100%"/>
 
-# Basic Usage
+## Overview
+Consistency Policies are fast and performant visuomotor policies. Consistency Policy (CP) works by distilling a teacher diffusion policy into a single or few-step student policy. This repo provides instructions and best practices for usage on your own tasks. More details can be found in [our paper](TODO). 
 
 ## Installation
 The below instructions are copied from [Diffusion Policy](https://github.com/real-stanford/diffusion_policy), though our conda_environment.yaml is different than theirs. 
@@ -43,9 +44,9 @@ You can also login to wandb if you wish to log your training runs.
 ## Training
 Training is done similarly to [Diffusion Policy](https://github.com/real-stanford/diffusion_policy). The user defines a config yaml file with their desired parameters and then runs the following command:
 ```console
-(consistency-policy)[Consistency_Policy]$ python train.py --config-dir=configs/ --config-name=edm_square.yaml
+(consistency-policy)[Consistency_Policy]$ python train.py --config-dir=configs/ --config-name=your_config_here.yaml
 ```
-Example configs for the robomimic square task are provided in the configs/ directory. Three types of networks are supported in this implementation and are referred to by their diffusion framework: EDM, CTMP, DDIM. 
+Example configs for the [Robomimic](https://robomimic.github.io/docs/datasets/robomimic_v0.1.html) Square task are provided in the configs/ directory. Three types of networks are supported in this implementation and are referred to by their diffusion framework: EDM, CTMP, DDIM. 
 
 To train a policy, pick a desired framework and update ```task```, ```dataset```, and ```shape_meta keys``` to match your task. If you are training without an online sim, set ```training.online_rollouts=false```. You should always set ```training.inference_mode=false``` while training. 
 
@@ -74,54 +75,9 @@ We also include a ```PolicyWrapper``` that wraps a provided policy with action a
 
 As mentioned earlier, a Consistency Policy can complete multi-step inference at test time. Before chaining is enabled, you must define the timesteps that you wish to chain at under ```policy.chaining_times```. We found that even partitions of discretized time work well as a heurstic: thus, our default setting is ```policy.chaining_times = ['D',27,54]``` for three-step inference that chains from 0, 27, and 54 bins. Once you have set this paramater, you must call ```policy.enable_chaining()``` (```PolicyWrapper``` supports this method as well). More details and an explanation of chaining can be found in our paper. 
 
-## 🖥️ Reproducing Simulation Benchmark Results 
-### Download Training Data
-Under the repo root, create data subdirectory:
-```console
-[Consitency_Policy]$ mkdir data && cd data
-```
 
-Download the corresponding zip file from [https://diffusion-policy.cs.columbia.edu/data/training/](https://diffusion-policy.cs.columbia.edu/data/training/)
-```console
-[data]$ wget https://diffusion-policy.cs.columbia.edu/data/training/pusht.zip
-```
-
-Extract training data:
-```console
-[data]$ unzip pusht.zip && rm -f pusht.zip && cd ..
-```
-
-Grab config file for the corresponding experiment:
-```console
-[diffusion_policy]$ wget -O image_pusht_diffusion_policy_cnn.yaml https://diffusion-policy.cs.columbia.edu/data/experiments/image/pusht/diffusion_policy_cnn/config.yaml
-```
-
-### Running for a single seed
-Activate conda environment and login to [wandb](https://wandb.ai) (if you haven't already).
-```console
-[diffusion_policy]$ conda activate robodiff
-(robodiff)[diffusion_policy]$ wandb login
-```
-
-Launch training with seed 42 on GPU 0.
-```console
-(robodiff)[diffusion_policy]$ python train.py --config-dir=. --config-name=image_pusht_diffusion_policy_cnn.yaml training.seed=42 training.device=cuda:0 hydra.run.dir='data/outputs/${now:%Y.%m.%d}/${now:%H.%M.%S}_${name}_${task_name}'
-```
-
-
-
-### 🆕 Evaluate Pre-trained Checkpoints
-TODO
-
-## 🦾 Demo, Training and Eval on a Real Robot
-TODO
-
-## 🔩 Key Components
-TODO
-
-
-## 🏷️ License
+## License
 This repository is released under the MIT license. See [LICENSE](LICENSE) for additional details.
 
-## 🙏 Acknowledgement
+## Acknowledgement
 TODO
