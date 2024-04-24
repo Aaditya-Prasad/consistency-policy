@@ -43,7 +43,7 @@ Training is done similarly to [Diffusion Policy](https://github.com/real-stanfor
 ```
 Example configs for the robomimic square task are provided in the configs/ directory. Three types of networks are supported in this implementation and are referred to by their diffusion framework: EDM, CTMP, DDIM. 
 
-To train a policy, pick a desired framework and update ```task```, ```dataset```, and ```shape_meta keys```, as well as any other hyperparamaters. If you are training without an online sim, set ```training.online_rollouts```=false. You should always set training.inference_mode=false while training. 
+To train a policy, pick a desired framework and update ```task```, ```dataset```, and ```shape_meta keys``` to match your task. If you are training without an online sim, set ```training.online_rollouts=false```. You should always set ```training.inference_mode=false``` while training. 
 
 Below are specific instructions for the different networks. 
 
@@ -60,7 +60,7 @@ As with the teacher network, ```policy.noise_scheduler``` contains most of the s
 By default, you are training and evaluating a single-step network. For multi-step inference, see the Deploying section below.  
 
 ### Baseline Network (DDiM)
-The baseline network is largely the same as in Diffusion Policy's implementation, and uses the Hugging Face DDiM noise scheduler. ```policy.num_inference``` steps plays a similar role to the teacher network's ```policy.noise_scheduler.bins```. The number of inference steps can be changed at test time and increases both accuracy and inference time. The baseline network cannot be used for distilation but can be useful to check your setup with, since it doesn't require the training of both a teacher and student network. 
+The baseline network is largely the same as in Diffusion Policy's implementation, and uses the Hugging Face DDiM noise scheduler. ```policy.num_inference_steps``` plays a similar role to the teacher network's ```policy.noise_scheduler.bins```. The number of inference steps can be changed at test time and increases both accuracy and inference time. The baseline network cannot be used for distilation but can be useful to check your setup with, since it doesn't require the training of both a teacher and student network. 
 
 ## Deploying
 
