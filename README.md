@@ -14,7 +14,6 @@
 <sup>1</sup>Stanford University
 
 <img src="media/teaser.png" alt="drawing" width="100%"/>
-<img src="media/multimodal_sim.png" alt="drawing" width="100%"/>
 
 # Basic Usage
 
@@ -36,6 +35,11 @@ but you can use conda as well:
 $ conda env create -f conda_environment.yaml
 ```
 
+You can also login to wandb if you wish to log your training runs. 
+```console
+[Consistency_Policy]$ conda activate consistency-policy
+(consistency-policy)[Consistency_Policy]$ wandb login
+```
 ## Training
 Training is done similarly to [Diffusion Policy](https://github.com/real-stanford/diffusion_policy). The user defines a config yaml file with their desired parameters and then runs the following command:
 ```console
@@ -68,19 +72,13 @@ Once you have trained a policy, you can use the ```get_policy``` function in ```
 
 We also include a ```PolicyWrapper``` that wraps a provided policy with action and observation chunking. ```example.ipynb``` shows an example of loading a policy, wrapping it, and generating new actions. 
 
-As mentioned earlier, a Consistency Policy can complete multi-step inference at test time. Before chaining is enabled, you must define the timesteps that you wish to chain at under ```policy.chaining_times```. We found that even partitions of discretized time work well as a heurstic: thus, our default setting is ```policy.chaining_times = ['D',27,54]``` for three-step inference that chains from 0, 27, and 54 bins. Once you have set this paramater, you must call ```policy.enable_chaining()``` (the ```PolicyWrapper``` supports this method as well). More details and an explanation of chaining can be found in our paper. 
-
-## 🧾 Checkout our experiment logs!
-
-## 🛠️ Installation
-
-### 🦾 Real Robot
+As mentioned earlier, a Consistency Policy can complete multi-step inference at test time. Before chaining is enabled, you must define the timesteps that you wish to chain at under ```policy.chaining_times```. We found that even partitions of discretized time work well as a heurstic: thus, our default setting is ```policy.chaining_times = ['D',27,54]``` for three-step inference that chains from 0, 27, and 54 bins. Once you have set this paramater, you must call ```policy.enable_chaining()``` (```PolicyWrapper``` supports this method as well). More details and an explanation of chaining can be found in our paper. 
 
 ## 🖥️ Reproducing Simulation Benchmark Results 
 ### Download Training Data
 Under the repo root, create data subdirectory:
 ```console
-[diffusion_policy]$ mkdir data && cd data
+[Consitency_Policy]$ mkdir data && cd data
 ```
 
 Download the corresponding zip file from [https://diffusion-policy.cs.columbia.edu/data/training/](https://diffusion-policy.cs.columbia.edu/data/training/)
