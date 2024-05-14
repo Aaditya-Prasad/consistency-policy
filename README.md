@@ -109,10 +109,6 @@ action = pw.get_action(obs)
 
 As mentioned earlier, a Consistency Policy can complete multi-step inference at test time. Before chaining is enabled, you must define the timesteps that you wish to chain at under ```policy.chaining_times```. We found that even partitions of discretized time work well as a heurstic: thus, our default setting is ```policy.chaining_times = ['D',27,54]``` for three-step inference that chains from 0, 27, and 54 bins. Once you have set this parameter, you must call ```policy.enable_chaining()``` (```PolicyWrapper``` supports this method as well). More details and an explanation of chaining can be found in our paper. 
 
-
-## License
-This repository is released under the MIT license. See [LICENSE](LICENSE) for additional details.
-
 ## Bibtex
 You can cite this work at 
 ```
@@ -124,6 +120,9 @@ You can cite this work at
   url       = {https://openreview.net/forum?id=Yfqe0ZH1IV}
 }
 ```
+
+## License
+This repository is released under the MIT license. See [LICENSE](LICENSE) for additional details.
 
 ## Acknowledgement
 Thank you to TRI for funding this work!
