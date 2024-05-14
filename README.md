@@ -1,4 +1,4 @@
-# Consistency Policy
+# Consistency Policy: Accelerated Visuomotor Policies via Consistency Distillation
 
 [[Project page]](https://consistency-policy.github.io/)
 [[Paper]](https://arxiv.org/abs/2405.07503)
@@ -13,6 +13,8 @@
 
 <sup>1</sup>Stanford University
 <sup>2</sup>Princeton University
+
+_Robotics: Science and Systems (RSS), 2024_
 
 <img src="media/teaser.png" alt="drawing" width="100%"/>
 
@@ -113,16 +115,16 @@ As mentioned earlier, a Consistency Policy can complete multi-step inference at 
 You can cite this work at 
 ```
 @inproceedings{prasad2024consistency,
-  title     = {Consistency Accelerated Policy Networks},
-  author    = {Prasad, Aaditya and Lin, Kevin and Wu, Jimmy and Zhou, Liqun and Bohg, Jeannette},
+  title     = {Consistency Policy: Accelerated Visuomotor Policies via Consistency Distillation},
+  author    = {Prasad, Aaditya and Lin, Kevin and Wu, Jimmy and Zhou, Linqi and Bohg, Jeannette},
   booktitle = {Robotics: Science and Systems},
   year      = {2024},
-  url       = {https://openreview.net/forum?id=Yfqe0ZH1IV}
 }
+
 ```
 
 ## License
 This repository is released under the MIT license. See [LICENSE](LICENSE) for additional details.
 
 ## Acknowledgement
-Thank you to TRI for funding this work!
+Much of our implementation is adapted from [Diffusion Policy](https://github.com/real-stanford/diffusion_policy)
