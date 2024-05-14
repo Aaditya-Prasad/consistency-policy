@@ -113,4 +113,4 @@ As mentioned earlier, a Consistency Policy can complete multi-step inference at 
 This repository is released under the MIT license. See [LICENSE](LICENSE) for additional details.
 
 ## Acknowledgement
-TODO
+Thank you to TRI for funding this work!
