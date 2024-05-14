@@ -22,7 +22,7 @@ _Robotics: Science and Systems (RSS), 2024_
 Consistency Policies are fast and performant visuomotor policies. Consistency Policy (CP) works by distilling a teacher diffusion policy into a single or few-step student policy. This repo provides instructions and best practices for usage on your own tasks. More details can be found in [our paper](https://arxiv.org/abs/2405.07503). 
 
 ## Installation
-The below instructions are copied from [Diffusion Policy](https://github.com/real-stanford/diffusion_policy), though our conda_environment.yaml is different than theirs. 
+The below instructions are copied from [Diffusion Policy](https://github.com/real-stanford/diffusion_policy), though our conda_environment.yaml is different from theirs. 
 
 Install our conda environment on a Linux machine with Nvidia GPU. On Ubuntu 20.04 you need to install the following apt packages for mujoco:
 ```console
@@ -41,13 +41,13 @@ $ conda env create -f conda_environment.yaml
 
 You can also login to wandb if you wish to log your training runs. 
 ```console
-[Consistency_Policy]$ conda activate consistency-policy
-(consistency-policy)[Consistency_Policy]$ wandb login
+[consistency-policy]$ conda activate consistency-policy
+(consistency-policy)[consistency-policy]$ wandb login
 ```
 ## Training
 Training is done similarly to [Diffusion Policy](https://github.com/real-stanford/diffusion_policy). The user defines a config yaml file with their desired parameters and then runs the following command:
 ```console
-(consistency-policy)[Consistency_Policy]$ python train.py --config-dir=configs/ --config-name=edm_square.yaml logging.name=edm_square
+(consistency-policy)[consistency-policy]$ python train.py --config-dir=configs/ --config-name=edm_square.yaml logging.name=edm_square
 ```
 Example configs for the [Robomimic](https://robomimic.github.io/docs/datasets/robomimic_v0.1.html) Square task are provided in the configs/ directory. Three types of networks are supported in this implementation and are referred to by their diffusion framework: EDM, CTMP, DDIM; the terminal code above is using the EDM config. 
 
@@ -72,7 +72,7 @@ The baseline network is largely the same as in Diffusion Policy's implementation
 
 ## Deploying
 
-Once you have trained a policy, you can use the ```get_policy``` function in ```consistency_policy.utils``` to load an inference-ready version of the policy from a checkpoint. If you wish to change any of the test-time hyperparameters of the policy, you can pass in a new config file with your desired changes. By default, ```get_policy``` loads the config that the model was trained with, activates inference mode, and deactivates online rollouts. 
+Once you have trained a policy, you can use the ```get_policy``` function in ```consistency_policy.utils``` to load an inference-ready version of the policy from a checkpoint. If you wish to change any of the test-time hyperparameters of the policy, you can pass in a new config with your desired changes. By default, ```get_policy``` loads the config that the model was trained with, activates inference mode, and deactivates online rollouts. 
 
 We also include a ```PolicyWrapper``` that wraps a provided policy with action and observation chunking. ```example.ipynb``` shows an example of loading a policy, wrapping it, and generating new actions; starter code is also copied below:
 
