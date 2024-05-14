@@ -1,8 +1,7 @@
 # Consistency Policy
 
-[[Project page]](TODO)
-[[Paper]](TODO)
-[[Data]](TODO)
+[[Project page]](https://consistency-policy.github.io/)
+[[Paper]](https://arxiv.org/abs/2405.07503)
 
 
 [Aaditya Prasad](https://aaditya-prasad.github.io/)<sup>1</sup>,
