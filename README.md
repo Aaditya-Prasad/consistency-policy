@@ -6,16 +6,18 @@
 
 [Aaditya Prasad](https://aaditya-prasad.github.io/)<sup>1</sup>,
 [Kevin Lin](https://kevin-thankyou-lin.github.io/)<sup>1</sup>,
+[Jimmy Wu](https://jimmyyhwu.github.io/)<sup>2</sup>,
 [Linqi Zhou](https://alexzhou907.github.io/)<sup>1</sup>,
 [Jeannette Bohg](https://web.stanford.edu/~bohg/)<sup>1</sup>,
 
 
 <sup>1</sup>Stanford University
+<sup>2</sup>Princeton University
 
 <img src="media/teaser.png" alt="drawing" width="100%"/>
 
 ## Overview
-Consistency Policies are fast and performant visuomotor policies. Consistency Policy (CP) works by distilling a teacher diffusion policy into a single or few-step student policy. This repo provides instructions and best practices for usage on your own tasks. More details can be found in [our paper](TODO). 
+Consistency Policies are fast and performant visuomotor policies. Consistency Policy (CP) works by distilling a teacher diffusion policy into a single or few-step student policy. This repo provides instructions and best practices for usage on your own tasks. More details can be found in [our paper](https://arxiv.org/abs/2405.07503). 
 
 ## Installation
 The below instructions are copied from [Diffusion Policy](https://github.com/real-stanford/diffusion_policy), though our conda_environment.yaml is different than theirs. 
@@ -110,6 +112,18 @@ As mentioned earlier, a Consistency Policy can complete multi-step inference at 
 
 ## License
 This repository is released under the MIT license. See [LICENSE](LICENSE) for additional details.
+
+## Bibtex
+You can cite this work at 
+```
+@inproceedings{prasad2024consistency,
+  title     = {Consistency Accelerated Policy Networks},
+  author    = {Prasad, Aaditya and Lin, Kevin and Wu, Jimmy and Zhou, Liqun and Bohg, Jeannette},
+  booktitle = {Robotics: Science and Systems},
+  year      = {2024},
+  url       = {https://openreview.net/forum?id=Yfqe0ZH1IV}
+}
+```
 
 ## Acknowledgement
 Thank you to TRI for funding this work!
