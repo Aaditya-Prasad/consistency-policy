@@ -8,7 +8,7 @@
 [Kevin Lin](https://kevin-thankyou-lin.github.io/)<sup>1</sup>,
 [Jimmy Wu](https://jimmyyhwu.github.io/)<sup>2</sup>,
 [Linqi Zhou](https://alexzhou907.github.io/)<sup>1</sup>,
-[Jeannette Bohg](https://web.stanford.edu/~bohg/)<sup>1</sup>,
+[Jeannette Bohg](https://web.stanford.edu/~bohg/)<sup>1</sup>
 
 
 <sup>1</sup>Stanford University
