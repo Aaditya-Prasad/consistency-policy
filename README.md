@@ -49,7 +49,7 @@ Training is done similarly to [Diffusion Policy](https://github.com/real-stanfor
 ```console
 (consistency-policy)[consistency-policy]$ python train.py --config-dir=configs/ --config-name=edm_square.yaml logging.name=edm_square
 ```
-Example configs for the [Robomimic](https://robomimic.github.io/docs/datasets/robomimic_v0.1.html) Square task are provided in the configs/ directory. Three types of networks are supported in this implementation and are referred to by their diffusion framework: EDM, CTMP, DDIM; the terminal code above is using the EDM config. 
+Example configs for the [Robomimic](https://robomimic.github.io/docs/datasets/robomimic_v0.1.html) Square task are provided in the configs/ directory. Three types of networks are supported in this implementation and are referred to by their diffusion framework: EDM, CTMP, DDIM; the terminal code above is using the EDM config. Ensure that your dataset is downloaded to the appropriate folder as denoted by the dataset paths in the cfg; for Robomimic tasks, you can find download instructions in [Diffusion Policy](https://arc.net/l/quote/pdmnqzdc).
 
 To train a policy, pick a desired framework and update ```task```, ```dataset```, and ```shape_meta keys``` to match your task. If you are training without an online sim, set ```training.online_rollouts=false```. You should always set ```training.inference_mode=false``` while training. 
 
