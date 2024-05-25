@@ -3,10 +3,10 @@ checkpoint:
   save_last_ckpt: true
   save_last_snapshot: false
   topk:
-    format_str: epoch={epoch:04d}-test_mean_score={test_mean_score:.3f}.ckpt
+    format_str: epoch={epoch:04d}-val_mse_error={val_mse_error:.3f}.ckpt
     k: 5
     mode: max
-    monitor_key: test_mean_score
+    monitor_key: val_mse_error
 dataloader:
   batch_size: 64
   num_workers: 8
@@ -71,14 +71,13 @@ policy:
   initial_ema_decay: 0.0
   delta: -1 #0.0068305197 # sqrt(160) * .00054
   special_skip: true
-  chaining_times: ['D', 27, 54]
   #teacher
-  teacher_path: ../consistency_policy/outputs/edm/square2/epoch=0200-test_mean_score=0.920.ckpt
+  teacher_path: outputs/edm/jimmy_v5large/checkpoints/epoch_200.ckpt
   #KDE
   use_kde: False
   kde_samples: 0
   #warm start
-  edm: ../consistency_policy/outputs/edm/square2/epoch=0200-test_mean_score=0.920.ckpt
+  edm: outputs/edm/jimmy_v5large/checkpoints/epoch_200.ckpt
   losses: [["ctm", "dsm"], [1, 1]]
   ctm_sampler: ctm
   dsm_weights: "karras"
@@ -100,61 +99,67 @@ policy:
   shape_meta:
     action:
       shape:
-      - 10
+      - 13
     obs:
-      agentview_image:
+      base_pose:
         shape:
         - 3
-        - 84
-        - 84
-        type: rgb
-      robot0_eef_pos:
+      arm_pos:
         shape:
         - 3
-      robot0_eef_quat:
+      arm_quat:
         shape:
         - 4
-      robot0_eye_in_hand_image:
+      gripper_pos:
+        shape:
+        - 1
+      base_image:
         shape:
         - 3
         - 84
         - 84
         type: rgb
-      robot0_gripper_qpos:
+      wrist_image:
         shape:
-        - 2
+        - 3
+        - 84
+        - 84
+        type: rgb
 shape_meta:
   action:
     shape:
-    - 10
+    - 13
   obs:
-    agentview_image:
+    base_pose:
       shape:
       - 3
-      - 84
-      - 84
-      type: rgb
-    robot0_eef_pos:
+    arm_pos:
       shape:
       - 3
-    robot0_eef_quat:
+    arm_quat:
       shape:
       - 4
-    robot0_eye_in_hand_image:
+    gripper_pos:
+      shape:
+      - 1
+    base_image:
       shape:
       - 3
       - 84
       - 84
       type: rgb
-    robot0_gripper_qpos:
+    wrist_image:
       shape:
-      - 2
+      - 3
+      - 84
+      - 84
+      type: rgb
 task:
   abs_action: true
   dataset:
-    _target_: diffusion_policy.dataset.robomimic_replay_image_dataset.RobomimicReplayImageDataset
+    _target_: consistency_policy.6Dpos_dataset.RobomimicReplayImageDataset
     abs_action: true
-    dataset_path: ../consistency_policy/data/robomimic/datasets/square/ph/image_abs.hdf5
+    dataset_path: data/jimmy/demos-microwave-v5.hdf5
     horizon: 16
     n_obs_steps: 2
     pad_after: 7
@@ -164,42 +169,45 @@ task:
     shape_meta:
       action:
         shape:
-        - 10
+        - 13
       obs:
-        agentview_image:
+        base_pose:
           shape:
           - 3
-          - 84
-          - 84
-          type: rgb
-        robot0_eef_pos:
+        arm_pos:
           shape:
           - 3
-        robot0_eef_quat:
+        arm_quat:
           shape:
           - 4
-        robot0_eye_in_hand_image:
+        gripper_pos:
+          shape:
+          - 1
+        base_image:
           shape:
           - 3
           - 84
           - 84
           type: rgb
-        robot0_gripper_qpos:
+        wrist_image:
           shape:
-          - 2
+          - 3
+          - 84
+          - 84
+          type: rgb
     use_cache: true
     val_ratio: 0.02
-  dataset_path: ../consistency_policy/data/robomimic/datasets/square/ph/image_abs.hdf5
+  dataset_path: data/jimmy/demos-microwave-v5.hdf5
   dataset_type: ph
   env_runner:
     _target_: diffusion_policy.env_runner.robomimic_image_runner.RobomimicImageRunner
     abs_action: true
     crf: 22
-    dataset_path: ../consistency_policy/data/robomimic/datasets/square/ph/image_abs.hdf5
+    dataset_path: data/jimmy/demos-microwave-v5.hdf5
     fps: 10
     max_steps: 400
     n_action_steps: 8
-    n_envs: 10
+    n_envs: 1
     n_obs_steps: 2
     n_test: 50
     n_test_vis: 4
@@ -210,64 +218,70 @@ task:
     shape_meta:
       action:
         shape:
-        - 10
+        - 13
       obs:
-        agentview_image:
+        base_pose:
           shape:
           - 3
-          - 84
-          - 84
-          type: rgb
-        robot0_eef_pos:
+        arm_pos:
           shape:
           - 3
-        robot0_eef_quat:
+        arm_quat:
           shape:
           - 4
-        robot0_eye_in_hand_image:
+        gripper_pos:
+          shape:
+          - 1
+        base_image:
           shape:
           - 3
           - 84
           - 84
           type: rgb
-        robot0_gripper_qpos:
+        wrist_image:
           shape:
-          - 2
+          - 3
+          - 84
+          - 84
+          type: rgb
     test_start_seed: 100000
     tqdm_interval_sec: 1.0
     train_start_idx: 0
-  name: square_image
+  name: jimmy
   shape_meta:
     action:
       shape:
-      - 10
+      - 13
     obs:
-      agentview_image:
+      base_pose:
         shape:
         - 3
-        - 84
-        - 84
-        type: rgb
-      robot0_eef_pos:
+      arm_pos:
         shape:
         - 3
-      robot0_eef_quat:
+      arm_quat:
         shape:
         - 4
-      robot0_eye_in_hand_image:
+      gripper_pos:
+        shape:
+        - 1
+      base_image:
         shape:
         - 3
         - 84
         - 84
         type: rgb
-      robot0_gripper_qpos:
+      wrist_image:
         shape:
-        - 2
+        - 3
+        - 84
+        - 84
+        type: rgb
   task_name: square
 task_name: square_image
 training:
   inference_mode: false # Setting this to true disables the teacher, warm start, and training loop
-  online_rollouts: true # Setting this to false disables the env_runner
+  online_rollouts: false # Setting this to false disables the env_runner
   debug: false
   checkpoint_every: 50
   device: cuda:0
@@ -277,8 +291,8 @@ training:
   max_train_steps: null
   max_val_steps: null
   num_epochs: 500
-  resume: false
-  resume_path: ???
+  resume: true
+  resume_path: outputs/ctm/jimmy_v5/checkpoints/epoch_400.ckpt
   rollout_every: 50
   sample_every: 5
   seed: 42
@@ -286,7 +300,7 @@ training:
   use_ema: true
   val_every: 1
   val_sample_every: 5
-  output_dir: outputs/cd/square/ctmpp
+  output_dir: outputs/cd/jimmy
   val_chaining_steps: 1
   p_epochs: 400
 val_dataloader:
