@@ -3,7 +3,6 @@ logs
 wandb
 local_configs/
 local_cfgs/
-train_scripts/
 
 outputs/
 data
