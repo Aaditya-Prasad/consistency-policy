@@ -303,7 +303,7 @@ def _convert_robomimic_to_replay(store, shape_meta, dataset_path, abs_action, ro
                 )
                 assert this_data.shape == (n_steps,) + tuple(shape_meta['action']['shape'])
             else:
-                assert this_data.shape == (n_steps,) + tuple(shape_meta['obs'][key]['shape'])
+                assert this_data.shape == (n_steps,) + tuple(shape_meta['obs'][key]['shape']), f"{key}, {this_data.shape}, {n_steps,}, {tuple(shape_meta['obs'][key]['shape'])}"
             _ = data_group.array(
                 name=key,
                 data=this_data,
