@@ -267,7 +267,7 @@ training:
   max_val_steps: null
   num_epochs: 400
   resume: false
-  resume_path: None
+  resume_path: ???
   rollout_every: 50
   sample_every: 5
   seed: 42

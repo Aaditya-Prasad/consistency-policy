@@ -475,19 +475,17 @@ class CTMPPUnetHybridImagePolicy(BaseImagePolicy):
                                     local_cond=local_cond, global_cond=global_cond)
 
             # u -> s
-            with torch.no_grad():
-                target = self._forward(self.model_ema, u_noise_traj, u_times, stops,
-                                    local_cond=local_cond, global_cond=global_cond)
+            target = self._forward(self.model_ema, u_noise_traj, u_times, stops,
+                                local_cond=local_cond, global_cond=global_cond)
 
             # now we take both back to 0
-            with torch.no_grad():
-                start = torch.tensor([self.noise_scheduler.time_min], device = trajectory.device).expand(times.shape)
+            start = torch.tensor([self.noise_scheduler.time_min], device = trajectory.device).expand(times.shape)
 
-                pred = self._forward(self.model_ema, pred, stops, start, 
-                                    local_cond=local_cond, global_cond=global_cond)
-                
-                target = self._forward(self.model_ema, target, stops, start,
-                                    local_cond=local_cond, global_cond=global_cond)
+            pred = self._forward(self.model_ema, pred, stops, start, 
+                                local_cond=local_cond, global_cond=global_cond)
+            
+            target = self._forward(self.model_ema, target, stops, start,
+                                local_cond=local_cond, global_cond=global_cond)
 
 
             loss = Huber_Loss(pred, target, delta = self.delta, weights=weights)

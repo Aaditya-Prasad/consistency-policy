@@ -73,12 +73,12 @@ policy:
   special_skip: true
   chaining_times: ['D', 27, 54]
   #teacher
-  teacher_path: outputs/edm/square2/epoch=0200-test_mean_score=0.920.ckpt
+  teacher_path: ??? 
   #KDE
   use_kde: False
   kde_samples: 0
   #warm start
-  edm: outputs/edm/square2/epoch=0200-test_mean_score=0.920.ckpt
+  edm: ??? 
   losses: [["ctm", "dsm"], [1, 1]]
   ctm_sampler: ctm
   dsm_weights: "karras"
@@ -277,8 +277,8 @@ training:
   max_train_steps: null
   max_val_steps: null
   num_epochs: 500
-  resume: true
-  resume_path: ../consistency_policy/outputs/cd/square/ablate_ctm/checkpoints/epoch=0250-test_mean_score=0.835.ckpt
+  resume: false
+  resume_path: ???
   rollout_every: 50
   sample_every: 5
   seed: 42
@@ -286,7 +286,7 @@ training:
   use_ema: true
   val_every: 1
   val_sample_every: 5
-  output_dir: outputs/cd/square/ctmpp
+  output_dir: outputs/cd/square/
   val_chaining_steps: 1
   p_epochs: 400
 val_dataloader:
