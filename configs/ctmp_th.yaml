@@ -1,0 +1,297 @@
+_target_: consistency_policy.student.ctm_workspace.CTMWorkspace
+checkpoint:
+  save_last_ckpt: true
+  save_last_snapshot: false
+  topk:
+    format_str: epoch={epoch:04d}-test_mean_score={test_mean_score:.3f}.ckpt
+    k: 5
+    mode: max
+    monitor_key: test_mean_score
+dataloader:
+  batch_size: 64
+  num_workers: 8
+  persistent_workers: false
+  pin_memory: true
+  shuffle: true
+dataset_obs_steps: 2
+ema:
+  _target_: diffusion_policy.model.diffusion.ema_model.EMAModel
+  inv_gamma: 1.0
+  max_value: 0.9999
+  min_value: 0.0
+  power: 0.75
+  update_after_step: 0
+exp_name: default
+horizon: 16
+keypoint_visible_rate: 1.0
+logging:
+  group: null
+  id: null
+  mode: online
+  name: default
+  project: cm_policy_debug
+  resume: false
+multi_run:
+  run_dir: data/outputs/cd/tool_hang/ctmpp
+  wandb_name_base: dsm_test
+n_action_steps: 8
+n_latency_steps: 0
+n_obs_steps: 2
+name: train_diffusion_unet_hybrid
+obs_as_global_cond: true
+optimizer:
+  _target_: torch.optim.AdamW
+  betas:
+  - 0.95
+  - 0.999
+  eps: 1.0e-08
+  lr: 0.0001
+  weight_decay: 1.0e-06
+past_action_visible: false
+policy:
+  _target_: consistency_policy.student.ctm_policy.CTMPPUnetHybridImagePolicy
+  inference_mode: none # this will be populated automatically from training.inference_mode, do not set it here
+  cond_predict_scale: true
+  crop_shape:
+  - 216
+  - 216
+  diffusion_step_embed_dim: 128
+  down_dims:
+  - 512
+  - 1024
+  - 2048
+  dropout_rate: 0.2
+  eval_fixed_crop: true
+  horizon: 16
+  kernel_size: 5
+  n_action_steps: 8
+  n_groups: 8
+  n_obs_steps: 2
+  #extra args
+  initial_ema_decay: 0.0
+  delta: -1 #0.0068305197 # sqrt(160) * .00054
+  special_skip: true
+  chaining_times: ['D', 27, 54]
+  #teacher
+  teacher_path: ??? 
+  #KDE
+  use_kde: False
+  kde_samples: 0
+  #warm start
+  edm: ??? 
+  losses: [["ctm", "dsm"], [1, 1]]
+  ctm_sampler: ctm
+  dsm_weights: "karras"
+  noise_scheduler:
+    _target_: consistency_policy.diffusion.CTM_Scheduler
+    time_min: 0.02
+    time_max: 80.0
+    rho: 7.0
+    bins: 80
+    solver: heun
+    scaling: boundary
+    use_c_in: true
+    data_std: .5
+    time_sampler: ctm
+    clamp: true
+    ode_steps_max: 1
+  obs_as_global_cond: true
+  obs_encoder_group_norm: true
+  shape_meta:
+    action:
+      shape:
+      - 10
+    obs:
+      sideview_image:
+        shape:
+        - 3
+        - 240
+        - 240
+        type: rgb
+      robot0_eef_pos:
+        shape:
+        - 3
+      robot0_eef_quat:
+        shape:
+        - 4
+      robot0_eye_in_hand_image:
+        shape:
+        - 3
+        - 240
+        - 240
+        type: rgb
+      robot0_gripper_qpos:
+        shape:
+        - 2
+shape_meta:
+  action:
+    shape:
+    - 10
+  obs:
+    sideview_image:
+      shape:
+      - 3
+      - 240
+      - 240
+      type: rgb
+    robot0_eef_pos:
+      shape:
+      - 3
+    robot0_eef_quat:
+      shape:
+      - 4
+    robot0_eye_in_hand_image:
+      shape:
+      - 3
+      - 240
+      - 240
+      type: rgb
+    robot0_gripper_qpos:
+      shape:
+      - 2
+task:
+  abs_action: true
+  dataset:
+    _target_: diffusion_policy.dataset.robomimic_replay_image_dataset.RobomimicReplayImageDataset
+    abs_action: true
+    dataset_path: data/robomimic/datasets/tool_hang/ph/image_abs.hdf5
+    horizon: 16
+    n_obs_steps: 2
+    pad_after: 7
+    pad_before: 1
+    rotation_rep: rotation_6d
+    seed: 42
+    shape_meta:
+      action:
+        shape:
+        - 10
+      obs:
+        sideview_image:
+          shape:
+          - 3
+          - 240
+          - 240
+          type: rgb
+        robot0_eef_pos:
+          shape:
+          - 3
+        robot0_eef_quat:
+          shape:
+          - 4
+        robot0_eye_in_hand_image:
+          shape:
+          - 3
+          - 240
+          - 240
+          type: rgb
+        robot0_gripper_qpos:
+          shape:
+          - 2
+    use_cache: true
+    val_ratio: 0.02
+  dataset_path: data/robomimic/datasets/tool_hang/ph/image_abs.hdf5
+  dataset_type: ph
+  env_runner:
+    _target_: diffusion_policy.env_runner.robomimic_image_runner.RobomimicImageRunner
+    abs_action: true
+    crf: 22
+    dataset_path: data/robomimic/datasets/tool_hang/ph/image_abs.hdf5
+    fps: 10
+    max_steps: 600
+    n_action_steps: 8
+    n_envs: 1
+    n_obs_steps: 2
+    n_test: 50
+    n_test_vis: 16
+    n_train: 6
+    n_train_vis: 2
+    past_action: false
+    render_obs_key: sideview_image
+    shape_meta:
+      action:
+        shape:
+        - 10
+      obs:
+        sideview_image:
+          shape:
+          - 3
+          - 240
+          - 240
+          type: rgb
+        robot0_eef_pos:
+          shape:
+          - 3
+        robot0_eef_quat:
+          shape:
+          - 4
+        robot0_eye_in_hand_image:
+          shape:
+          - 3
+          - 240
+          - 240
+          type: rgb
+        robot0_gripper_qpos:
+          shape:
+          - 2
+    test_start_seed: 100000
+    tqdm_interval_sec: 1.0
+    train_start_idx: 0
+  name: tool_hang_image
+  shape_meta:
+    action:
+      shape:
+      - 10
+    obs:
+      sideview_image:
+        shape:
+        - 3
+        - 240
+        - 240
+        type: rgb
+      robot0_eef_pos:
+        shape:
+        - 3
+      robot0_eef_quat:
+        shape:
+        - 4
+      robot0_eye_in_hand_image:
+        shape:
+        - 3
+        - 240
+        - 240
+        type: rgb
+      robot0_gripper_qpos:
+        shape:
+        - 2
+  task_name: tool_hang
+task_name: tool_hang_image
+training:
+  inference_mode: false # Setting this to true disables the teacher, warm start, and training loop
+  online_rollouts: true # Setting this to false disables the env_runner
+  debug: false
+  checkpoint_every: 50
+  device: cuda:0
+  gradient_accumulate_every: 1
+  lr_scheduler: cosine
+  lr_warmup_steps: 500
+  max_train_steps: null
+  max_val_steps: null
+  num_epochs: 500
+  resume: false
+  resume_path: ???
+  rollout_every: 50
+  sample_every: 5
+  seed: 42
+  tqdm_interval_sec: 1.0
+  use_ema: true
+  val_every: 1
+  val_sample_every: 5
+  output_dir: outputs/cd/tool_hang
+  val_chaining_steps: 1
+  p_epochs: 400
+val_dataloader:
+  batch_size: 64
+  num_workers: 8
+  persistent_workers: false
+  pin_memory: true
+  shuffle: false

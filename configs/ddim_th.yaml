@@ -1,0 +1,287 @@
+_target_: consistency_policy.baseline.train_diffusion_unet_hybrid_workspace.TrainDiffusionUnetHybridWorkspace
+checkpoint:
+  save_last_ckpt: true
+  save_last_snapshot: false
+  topk:
+    format_str: epoch={epoch:04d}-test_mean_score={test_mean_score:.3f}.ckpt
+    k: 5
+    mode: max
+    monitor_key: test_mean_score
+dataloader:
+  batch_size: 128
+  num_workers: 8
+  persistent_workers: false
+  pin_memory: true
+  shuffle: true
+dataset_obs_steps: 2
+ema:
+  _target_: diffusion_policy.model.diffusion.ema_model.EMAModel
+  inv_gamma: 1.0
+  max_value: 0.9999
+  min_value: 0.0
+  power: 0.75
+  update_after_step: 0
+exp_name: default
+horizon: 16
+keypoint_visible_rate: 1.0
+logging:
+  group: null
+  id: null
+  mode: online
+  name: dp_test
+  project: diffusion_policy_debug
+  resume: true
+  tags:
+  - train_diffusion_unet_hybrid
+  - tool_hang_image
+  - default
+multi_run:
+  run_dir: data/outputs/2022.12.29/22.31.27_train_diffusion_unet_hybrid_tool_hang_image
+  wandb_name_base: dp_test
+n_action_steps: 8
+n_latency_steps: 0
+n_obs_steps: 2
+name: train_diffusion_unet_hybrid
+obs_as_global_cond: true
+optimizer:
+  _target_: torch.optim.AdamW
+  betas:
+  - 0.95
+  - 0.999
+  eps: 1.0e-08
+  lr: 0.0001
+  weight_decay: 1.0e-06
+past_action_visible: false
+policy:
+  _target_: diffusion_policy.policy.diffusion_unet_hybrid_image_policy.DiffusionUnetHybridImagePolicy
+  cond_predict_scale: true
+  crop_shape:
+  - 216
+  - 216
+  diffusion_step_embed_dim: 128
+  down_dims:
+  - 512
+  - 1024
+  - 2048
+  eval_fixed_crop: true
+  horizon: 16
+  kernel_size: 5
+  n_action_steps: 8
+  n_groups: 8
+  n_obs_steps: 2
+  noise_scheduler:
+    # _target_: diffusers.schedulers.scheduling_ddpm.DDPMScheduler
+    # beta_end: 0.02
+    # beta_schedule: squaredcos_cap_v2
+    # beta_start: 0.0001
+    # clip_sample: true
+    # num_train_timesteps: 100
+    # prediction_type: epsilon
+    # variance_type: fixed_small
+    _target_: diffusers.schedulers.scheduling_ddim.DDIMScheduler
+    num_train_timesteps: 100
+    beta_start: 0.0001
+    beta_end: 0.02
+    beta_schedule: squaredcos_cap_v2
+    clip_sample: True
+    set_alpha_to_one: True
+    steps_offset: 0
+    prediction_type: epsilon # or sample
+  num_inference_steps: 15
+  obs_as_global_cond: true
+  obs_encoder_group_norm: true
+  shape_meta:
+    action:
+      shape:
+      - 10
+    obs:
+      sideview_image:
+        shape:
+        - 3
+        - 240
+        - 240
+        type: rgb
+      robot0_eef_pos:
+        shape:
+        - 3
+      robot0_eef_quat:
+        shape:
+        - 4
+      robot0_eye_in_hand_image:
+        shape:
+        - 3
+        - 240
+        - 240
+        type: rgb
+      robot0_gripper_qpos:
+        shape:
+        - 2
+shape_meta:
+  action:
+    shape:
+    - 10
+  obs:
+    sideview_image:
+      shape:
+      - 3
+      - 240
+      - 240
+      type: rgb
+    robot0_eef_pos:
+      shape:
+      - 3
+    robot0_eef_quat:
+      shape:
+      - 4
+    robot0_eye_in_hand_image:
+      shape:
+      - 3
+      - 240
+      - 240
+      type: rgb
+    robot0_gripper_qpos:
+      shape:
+      - 2
+task:
+  abs_action: true
+  dataset:
+    _target_: diffusion_policy.dataset.robomimic_replay_image_dataset.RobomimicReplayImageDataset
+    abs_action: true
+    dataset_path: data/robomimic/datasets/tool_hang/ph/image_abs.hdf5
+    horizon: 16
+    n_obs_steps: 2
+    pad_after: 7
+    pad_before: 1
+    rotation_rep: rotation_6d
+    seed: 42
+    shape_meta:
+      action:
+        shape:
+        - 10
+      obs:
+        sideview_image:
+          shape:
+          - 3
+          - 240
+          - 240
+          type: rgb
+        robot0_eef_pos:
+          shape:
+          - 3
+        robot0_eef_quat:
+          shape:
+          - 4
+        robot0_eye_in_hand_image:
+          shape:
+          - 3
+          - 240
+          - 240
+          type: rgb
+        robot0_gripper_qpos:
+          shape:
+          - 2
+    use_cache: true
+    val_ratio: 0.02
+  dataset_path: data/robomimic/datasets/tool_hang/ph/image_abs.hdf5
+  dataset_type: ph
+  env_runner:
+    _target_: diffusion_policy.env_runner.robomimic_image_runner.RobomimicImageRunner
+    abs_action: true
+    crf: 22
+    dataset_path: data/robomimic/datasets/tool_hang/ph/image_abs.hdf5
+    fps: 10
+    max_steps: 600
+    n_action_steps: 8
+    n_envs: 1
+    n_obs_steps: 2
+    n_test: 30
+    n_test_vis: 16
+    n_train: 2
+    n_train_vis: 2
+    past_action: false
+    render_obs_key: sideview_image
+    shape_meta:
+      action:
+        shape:
+        - 10
+      obs:
+        sideview_image:
+          shape:
+          - 3
+          - 240
+          - 240
+          type: rgb
+        robot0_eef_pos:
+          shape:
+          - 3
+        robot0_eef_quat:
+          shape:
+          - 4
+        robot0_eye_in_hand_image:
+          shape:
+          - 3
+          - 240
+          - 240
+          type: rgb
+        robot0_gripper_qpos:
+          shape:
+          - 2
+    test_start_seed: 100000
+    tqdm_interval_sec: 1.0
+    train_start_idx: 0
+  name: tool_hang_image
+  shape_meta:
+    action:
+      shape:
+      - 10
+    obs:
+      sideview_image:
+        shape:
+        - 3
+        - 240
+        - 240
+        type: rgb
+      robot0_eef_pos:
+        shape:
+        - 3
+      robot0_eef_quat:
+        shape:
+        - 4
+      robot0_eye_in_hand_image:
+        shape:
+        - 3
+        - 240
+        - 240
+        type: rgb
+      robot0_gripper_qpos:
+        shape:
+        - 2
+  task_name: tool_hang
+task_name: tool_hang_image
+training:
+  checkpoint_every: 50
+  debug: false
+  device: cuda:0
+  gradient_accumulate_every: 1
+  lr_scheduler: cosine
+  lr_warmup_steps: 500
+  max_train_steps: null
+  max_val_steps: null
+  num_epochs: 8000
+  resume: false 
+  resume_path: ???
+  rollout_every: 50
+  sample_every: 5
+  seed: 42
+  tqdm_interval_sec: 1.0
+  use_ema: true
+  val_every: 1
+  val_sample_every: 5
+  num_evaluate_steps: 8
+  output_dir: outputs/ddim/tool_hang
+val_dataloader:
+  batch_size: 64
+  num_workers: 8
+  persistent_workers: false
+  pin_memory: true
+  shuffle: false
